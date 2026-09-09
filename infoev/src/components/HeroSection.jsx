@@ -33,7 +33,7 @@ export default function HeroSection({
     {
       type: 'Smart Urban Precision Scooter',
       name: 'Ather 450X Gen 3',
-      tagline: 'Warp Mode • Google Maps Dashboard • From ₹100/day',
+      tagline: 'Warp Mode • Google Maps Dashboard • Student Monthly Plan',
       image: '/images/ather_450x.png',
       badge: 'Best City Commuter',
       accent: 'from-emerald-500 to-cyan-600',
@@ -208,7 +208,7 @@ export default function HeroSection({
 
           <div className="p-4 rounded-2xl bg-slate-900/50 border border-slate-800/80">
             <span className="text-xs font-semibold text-slate-400 block uppercase tracking-wider">Student EV Plan</span>
-            <span className="text-2xl sm:text-3xl font-black text-white mt-1 block">From ₹50/day</span>
+            <span className="text-2xl sm:text-3xl font-black text-white mt-1 block">From ₹50/mo</span>
             <span className="text-[11px] text-cyan-400 mt-1 block">Verified safety & parental care</span>
           </div>
 

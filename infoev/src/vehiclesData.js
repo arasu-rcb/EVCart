@@ -22,13 +22,13 @@ export const carBrands = [
   { id: 'kia', name: 'Kia EV' }
 ];
 
-export const lifestyleCategories = [
+export const bikeCategories = [
   {
     id: 'daily',
     name: 'Daily Usage',
     icon: 'Bike',
     emoji: '🏍️',
-    description: 'Ultra-reliable, low-running-cost vehicles engineered for stress-free daily city commuting.',
+    description: 'Ultra-reliable, low-running-cost electric two-wheelers engineered for stress-free daily city commuting.',
     badge: 'High Efficiency',
     prioritySpecs: ['Low running cost', 'Agile handling', 'Quick home charging', 'Regenerative braking']
   },
@@ -37,7 +37,7 @@ export const lifestyleCategories = [
     name: 'Long Drive',
     icon: 'Compass',
     emoji: '🛣️',
-    description: 'High battery capacities, highway range stability, and ultra-fast charging for long interstate trips.',
+    description: 'High battery capacities, highway range stability, and fast charging for interstate travel.',
     badge: 'Maximum Range',
     prioritySpecs: ['Extended range', 'Fast charging support', 'Cruise ergonomics', 'Active thermal cooling']
   },
@@ -46,9 +46,9 @@ export const lifestyleCategories = [
     name: 'College Students',
     icon: 'GraduationCap',
     emoji: '🎓',
-    description: 'Affordable, sporty, and tech-loaded electric rides tailored for college budgets and smart commutes.',
-    badge: '₹100/day Plan',
-    prioritySpecs: ['From ₹100/day', 'Smart GPS & App', 'Youth aesthetic', 'Low maintenance']
+    description: 'Sporty and tech-loaded electric rides tailored for student budgets with smart navigation & app connectivity.',
+    badge: '₹100/mo Plan',
+    prioritySpecs: ['From ₹100/mo', 'Smart GPS & App', 'Youth aesthetic', 'Low maintenance']
   },
   {
     id: 'school',
@@ -57,14 +57,14 @@ export const lifestyleCategories = [
     emoji: '🏫',
     description: 'Speed-compliant safety-first electric models with mandatory parental verification & geofencing.',
     badge: 'Parent Verified',
-    prioritySpecs: ['Speed-governed (25 km/h)', 'Guardian consent required', 'From ₹50/day', 'Geofence tracking']
+    prioritySpecs: ['Speed-governed (25 km/h)', 'Guardian consent required', 'From ₹50/mo', 'Geofence tracking']
   },
   {
     id: 'family',
     name: 'Family',
     icon: 'Users',
     emoji: '👨‍👩‍👧‍👦',
-    description: 'Spacious seating, extra comfort, massive boot capacity, and 5-star safety for the whole household.',
+    description: 'Spacious dual-seating, cushioned comfort, massive boot capacity, and 5-star safety for the whole household.',
     badge: 'Safety & Space',
     prioritySpecs: ['Large comfortable seats', 'Massive storage', 'Passenger safety', 'Smooth ride']
   },
@@ -73,7 +73,7 @@ export const lifestyleCategories = [
     name: 'Performance',
     icon: 'Zap',
     emoji: '⚡',
-    description: 'Track-tuned acceleration, blistering top speeds, race-spec aerodynamics, and instant torque delivery.',
+    description: 'Track-tuned acceleration, blistering top speeds, race-spec aerodynamics, and instant electric torque.',
     badge: 'Insane Speed',
     prioritySpecs: ['Instant 0-60 torque', 'Aerodynamic winglets', 'Track telemetry', 'Performance modes']
   },
@@ -87,6 +87,67 @@ export const lifestyleCategories = [
     prioritySpecs: ['Lowest entry price', 'Under ₹0.25/km', 'Subsidized EMI', 'Zero petrol burn']
   }
 ];
+
+export const carCategories = [
+  {
+    id: 'daily',
+    name: 'Daily Usage',
+    icon: 'Car',
+    emoji: '🚗',
+    description: 'Effortless urban electric cars engineered for daily commuting with low charging costs and easy parking.',
+    badge: 'City Commuter',
+    prioritySpecs: ['Low operating cost', 'Compact footprint', 'Home Wallbox charging', 'Automatic drive']
+  },
+  {
+    id: 'long-drive',
+    name: 'Long Drive',
+    icon: 'Compass',
+    emoji: '🛣️',
+    description: 'Highway cruisers with massive battery capacity, DC fast charging, and plush long-distance comfort.',
+    badge: 'Highway Cruiser',
+    prioritySpecs: ['500+ km range', 'DC fast charge (800V)', 'Adaptive cruise', 'Dual-motor AWD']
+  },
+  {
+    id: 'family',
+    name: 'Family',
+    icon: 'Users',
+    emoji: '👨‍👩‍👧‍👦',
+    description: '5 to 7-seater electric SUVs and sedans offering maximum cabin space, 5-star crash safety, and huge boots.',
+    badge: '5-Star Safety',
+    prioritySpecs: ['Spacious 5-seater', 'ADAS Level 2 safety', 'High ground clearance', 'ISOFIX child anchors']
+  },
+  {
+    id: 'premium',
+    name: 'Premium & Luxury',
+    icon: 'Zap',
+    emoji: '✨',
+    description: 'Flagship electric craftsmanship, ultra-luxury lounge interiors, air suspension, and cutting-edge tech.',
+    badge: 'Flagship Luxury',
+    prioritySpecs: ['Panoramic glass roof', 'Air suspension', 'Premium acoustics', 'Ventilated massage seats']
+  },
+  {
+    id: 'budget',
+    name: 'Budget Friendly',
+    icon: 'Coins',
+    emoji: '💰',
+    description: 'India\'s most accessible electric cars offering unbeatable value, high savings, and low upfront costs.',
+    badge: 'Affordable EV',
+    prioritySpecs: ['Lowest entry price', 'Under ₹1/km running cost', 'Affordable EMI', 'Government subsidies']
+  },
+  {
+    id: 'student-friendly',
+    name: 'Student Friendly',
+    icon: 'GraduationCap',
+    emoji: '🎓',
+    description: 'Compact, modern, and affordable electric runabouts ideal for college campus runs and young drivers.',
+    badge: 'Campus Ready',
+    prioritySpecs: ['Student monthly plan', 'Easy to drive', 'Low charging cost', 'Connected touchscreen']
+  }
+];
+
+// Backward-compatible alias
+export const lifestyleCategories = bikeCategories;
+
 
 export const bikesData = [
   // --- OLA ELECTRIC ---
@@ -539,7 +600,7 @@ export const bikesData = [
     highlights: [
       'Pure digital LED instrument console',
       'Regenerative braking with CBS safety',
-      'Ultra-affordable ₹50/day student plan',
+      'Ultra-affordable ₹50/month student plan',
       'Comfortable split seat ergonomics'
     ],
     petrolComparison: {
@@ -715,7 +776,7 @@ export const bikesData = [
       '25 km/h safety speed limiter (No license needed)',
       'Parental consent & geofencing protection',
       'Ultra-lightweight 24kg aluminum frame',
-      'From ₹35/day on student concept plan'
+      'From ₹50/month on student concept plan'
     ],
     petrolComparison: {
       runningCostEV: '₹0.08 / km',
@@ -916,7 +977,8 @@ export const carsData = [
     price: 1449000,
     priceUSD: 17600,
     emi: '₹22,999/mo',
-    studentDailyPlan: { schoolDaily: 420, collegeDaily: 680 },
+    studentMonthlyPlan: { eligible: true, schoolMonthly: 50, collegeMonthly: 100 },
+    studentDailyPlan: { schoolDaily: 50, collegeDaily: 100 },
     range: 465, // km
     topSpeed: 150, // km/h
     batteryCapacity: 40.5, // kWh
@@ -927,9 +989,9 @@ export const carsData = [
     seatHeight: 510, // mm
     rating: 4.85,
     reviewCount: 650,
-    categories: ['daily', 'family', 'budget', 'college'],
+    categories: ['daily', 'long-drive', 'family', 'budget'],
     dailyUsage: true,
-    longDrive: false,
+    longDrive: true,
     college: true,
     school: false,
     family: true,
@@ -974,7 +1036,8 @@ export const carsData = [
     price: 899000,
     priceUSD: 10900,
     emi: '₹14,500/mo',
-    studentDailyPlan: { schoolDaily: 280, collegeDaily: 450 },
+    studentMonthlyPlan: { eligible: true, schoolMonthly: 50, collegeMonthly: 100 },
+    studentDailyPlan: { schoolDaily: 50, collegeDaily: 100 },
     range: 315, // km
     topSpeed: 120, // km/h
     batteryCapacity: 24.0, // kWh
@@ -985,12 +1048,12 @@ export const carsData = [
     seatHeight: 490, // mm
     rating: 4.8,
     reviewCount: 480,
-    categories: ['daily', 'college', 'school', 'budget'],
+    categories: ['daily', 'budget', 'student-friendly', 'family'],
     dailyUsage: true,
     longDrive: false,
     college: true,
     school: true,
-    family: false,
+    family: true,
     performance: false,
     budget: true,
     stance: 'Urban Compact',
@@ -1034,7 +1097,8 @@ export const carsData = [
     price: 1399000,
     priceUSD: 17000,
     emi: '₹21,500/mo',
-    studentDailyPlan: { schoolDaily: 390, collegeDaily: 620 },
+    studentMonthlyPlan: { eligible: true, schoolMonthly: 50, collegeMonthly: 100 },
+    studentDailyPlan: { schoolDaily: 50, collegeDaily: 100 },
     range: 331, // km
     topSpeed: 140, // km/h
     batteryCapacity: 38.0, // kWh
@@ -1045,7 +1109,7 @@ export const carsData = [
     seatHeight: 520, // mm
     rating: 4.8,
     reviewCount: 320,
-    categories: ['daily', 'family', 'college', 'budget'],
+    categories: ['daily', 'family', 'student-friendly', 'budget'],
     dailyUsage: true,
     longDrive: false,
     college: true,
@@ -1092,7 +1156,8 @@ export const carsData = [
     price: 699000,
     priceUSD: 8500,
     emi: '₹11,900/mo',
-    studentDailyPlan: { schoolDaily: 210, collegeDaily: 350 },
+    studentMonthlyPlan: { eligible: true, schoolMonthly: 50, collegeMonthly: 100 },
+    studentDailyPlan: { schoolDaily: 50, collegeDaily: 100 },
     range: 230, // km
     topSpeed: 100, // km/h
     batteryCapacity: 17.3, // kWh
@@ -1103,7 +1168,7 @@ export const carsData = [
     seatHeight: 500, // mm
     rating: 4.7,
     reviewCount: 290,
-    categories: ['school', 'college', 'budget', 'daily'],
+    categories: ['daily', 'budget', 'student-friendly'],
     dailyUsage: true,
     longDrive: false,
     college: true,
@@ -1151,7 +1216,8 @@ export const carsData = [
     price: 8990000,
     priceUSD: 89990,
     emi: '₹1,45,000/mo',
-    studentDailyPlan: { schoolDaily: 1200, collegeDaily: 2500 },
+    studentMonthlyPlan: null,
+    studentDailyPlan: null,
     range: 637, // km
     topSpeed: 322, // km/h
     batteryCapacity: 100.0, // kWh
@@ -1162,7 +1228,7 @@ export const carsData = [
     seatHeight: 480, // mm
     rating: 4.95,
     reviewCount: 780,
-    categories: ['long-drive', 'performance'],
+    categories: ['long-drive', 'performance', 'premium'],
     dailyUsage: false,
     longDrive: true,
     college: false,
@@ -1209,7 +1275,8 @@ export const carsData = [
     price: 5490000,
     priceUSD: 49990,
     emi: '₹88,000/mo',
-    studentDailyPlan: { schoolDaily: 850, collegeDaily: 1600 },
+    studentMonthlyPlan: null,
+    studentDailyPlan: null,
     range: 533, // km
     topSpeed: 217, // km/h
     batteryCapacity: 75.0, // kWh
@@ -1220,7 +1287,7 @@ export const carsData = [
     seatHeight: 520, // mm
     rating: 4.9,
     reviewCount: 920,
-    categories: ['daily', 'long-drive', 'family'],
+    categories: ['daily', 'long-drive', 'family', 'premium'],
     dailyUsage: true,
     longDrive: true,
     college: false,
@@ -1269,7 +1336,8 @@ export const carsData = [
     price: 24900000,
     priceUSD: 194900,
     emi: '₹3,90,000/mo',
-    studentDailyPlan: { schoolDaily: 2500, collegeDaily: 4500 },
+    studentMonthlyPlan: null,
+    studentDailyPlan: null,
     range: 450, // km
     topSpeed: 260, // km/h
     batteryCapacity: 93.4, // kWh
@@ -1280,7 +1348,7 @@ export const carsData = [
     seatHeight: 460, // mm
     rating: 4.95,
     reviewCount: 310,
-    categories: ['long-drive', 'performance'],
+    categories: ['long-drive', 'performance', 'premium'],
     dailyUsage: false,
     longDrive: true,
     college: false,
@@ -1329,7 +1397,8 @@ export const carsData = [
     price: 4555000,
     priceUSD: 51000,
     emi: '₹72,000/mo',
-    studentDailyPlan: { schoolDaily: 750, collegeDaily: 1350 },
+    studentMonthlyPlan: null,
+    studentDailyPlan: null,
     range: 580, // km
     topSpeed: 190, // km/h
     batteryCapacity: 82.5, // kWh
@@ -1340,7 +1409,7 @@ export const carsData = [
     seatHeight: 490, // mm
     rating: 4.88,
     reviewCount: 450,
-    categories: ['daily', 'long-drive', 'performance'],
+    categories: ['daily', 'long-drive', 'performance', 'premium'],
     dailyUsage: true,
     longDrive: true,
     college: false,
@@ -1389,7 +1458,8 @@ export const carsData = [
     price: 9200000,
     priceUSD: 78000,
     emi: '₹1,48,000/mo',
-    studentDailyPlan: { schoolDaily: 1400, collegeDaily: 2600 },
+    studentMonthlyPlan: null,
+    studentDailyPlan: null,
     range: 643, // km
     topSpeed: 201, // km/h
     batteryCapacity: 135.0, // kWh
@@ -1400,7 +1470,7 @@ export const carsData = [
     seatHeight: 620, // mm
     rating: 4.9,
     reviewCount: 340,
-    categories: ['long-drive', 'family'],
+    categories: ['long-drive', 'family', 'premium'],
     dailyUsage: false,
     longDrive: true,
     college: false,
@@ -1449,7 +1519,8 @@ export const carsData = [
     price: 4600000,
     priceUSD: 45000,
     emi: '₹73,500/mo',
-    studentDailyPlan: { schoolDaily: 760, collegeDaily: 1380 },
+    studentMonthlyPlan: { eligible: true, schoolMonthly: 50, collegeMonthly: 100 },
+    studentDailyPlan: { schoolDaily: 50, collegeDaily: 100 },
     range: 488, // km
     topSpeed: 185, // km/h
     batteryCapacity: 77.4, // kWh
@@ -1460,11 +1531,11 @@ export const carsData = [
     seatHeight: 530, // mm
     rating: 4.88,
     reviewCount: 520,
-    categories: ['daily', 'family', 'school', 'college'],
+    categories: ['daily', 'long-drive', 'family', 'premium', 'student-friendly'],
     dailyUsage: true,
-    longDrive: false,
+    longDrive: true,
     college: true,
-    school: true,
+    school: false,
     family: true,
     performance: false,
     budget: false,

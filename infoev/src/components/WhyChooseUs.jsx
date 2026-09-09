@@ -1,6 +1,6 @@
 import {
   Zap, BatteryCharging, DollarSign, Leaf, Wrench,
-  GraduationCap, Scale, RotateCw, Sparkles
+  GraduationCap, Scale, Sparkles
 } from 'lucide-react';
 
 export default function WhyChooseUs() {
@@ -33,7 +33,7 @@ export default function WhyChooseUs() {
     {
       icon: <GraduationCap className="w-6 h-6 text-cyan-300" />,
       title: 'Student Friendly Plans',
-      description: 'Concept daily micro-plans starting from ₹50/day (School) and ₹100/day (College) with guardian verification.'
+      description: 'Concept monthly micro-plans starting from ₹50/month (School) and ₹100/month (College) with guardian verification.'
     },
     {
       icon: <Scale className="w-6 h-6 text-purple-400" />,
@@ -41,9 +41,9 @@ export default function WhyChooseUs() {
       description: 'Objective multi-vehicle spec matrix with our automated algorithm dynamically computing Best Choice recommendations.'
     },
     {
-      icon: <RotateCw className="w-6 h-6 text-sky-400" />,
-      title: 'Interactive 3D & 360° Experience',
-      description: 'Inspect chassis details, lighting geometry, and paint angles in full Three.js 3D and drag-to-rotate turntables.'
+      icon: <BatteryCharging className="w-6 h-6 text-sky-400" />,
+      title: 'Certified Battery Warranty',
+      description: 'All vehicles backed by 8-year or 1,60,000 km manufacturer warranties with certified thermal management safety.'
     }
   ];
 

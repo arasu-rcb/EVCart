@@ -13,7 +13,7 @@ export default function ReviewsAndFAQ({ onContactClick }) {
       role: 'Final Year Engineering Student (RV College)',
       vehicle: 'Revolt RV400 Premium',
       rating: 5,
-      comment: 'The student concept plan was a lifesaver. Paying roughly ₹100/day from my part-time internship stipend instead of burning ₹4,000 monthly on petrol. Dorm room battery charging works flawlessly.',
+      comment: 'The student monthly plan was a lifesaver. Contributing ₹100/month from my part-time internship stipend instead of burning ₹4,000 monthly on petrol. Dorm room battery charging works flawlessly.',
       date: '2 weeks ago',
       verified: true
     },
@@ -39,8 +39,8 @@ export default function ReviewsAndFAQ({ onContactClick }) {
 
   const faqs = [
     {
-      q: 'How does the Student EV Plan (₹50/day and ₹100/day) work?',
-      a: 'The EV Student Plan is a concept daily micro-installment breakdown designed to illustrate low-barrier entry for school and college riders. School students require mandatory parent/guardian verification and speed-limited models (25 km/h). College students can submit their institution ID for fast-tracked eligibility.'
+      q: 'How does the Student EV Monthly Plan (₹50/month and ₹100/month) work?',
+      a: 'The EV Student Plan is a conceptual promotional payment model designed to illustrate low-barrier entry for school and college riders. School students require mandatory parent/guardian verification and speed-governed models (25 km/h). College students can submit their institution ID for fast-tracked eligibility.'
     },
     {
       q: 'Can school students directly purchase electric bikes on this website?',

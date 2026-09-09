@@ -97,8 +97,8 @@ export default function CompareModal({
       reasons.push(`Optimized Energy Consumption: Low running cost of approximately ${champ.petrolComparison?.runningCostEV || '₹0.30/km'}.`);
     }
 
-    if (champ.studentDailyPlan) {
-      reasons.push(`Student & Family Friendly: Eligible for flexible daily concept plans starting from ₹${champ.studentDailyPlan.schoolDaily}/day.`);
+    if (champ.studentMonthlyPlan || champ.studentDailyPlan) {
+      reasons.push(`Student & Family Friendly: Eligible for promotional student monthly plans starting from ₹50/month.`);
     }
 
     return {
@@ -333,13 +333,13 @@ export default function CompareModal({
                   <td className="p-4 font-bold text-slate-500 dark:text-slate-400">Student Plan</td>
                   {vehicles.map(v => (
                     <td key={v.id} className="p-4">
-                      {v.studentDailyPlan ? (
+                      {v.studentMonthlyPlan || v.studentDailyPlan ? (
                         <div>
                           <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold text-xs">
-                            ✓ From ₹{v.studentDailyPlan.schoolDaily}/day
+                            ✓ From ₹50/month
                           </span>
                           <div className="text-[10px] text-slate-400 mt-1">
-                            College: ₹{v.studentDailyPlan.collegeDaily}/day
+                            College: ₹100/month
                           </div>
                         </div>
                       ) : (

@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import {
   Sun, Moon, Search, Scale, ChevronDown, Menu, X,
-  Zap, User, Bike, Car, Tag
+  Zap, Bike, Car, Tag, Calendar
 } from 'lucide-react';
-import { lifestyleCategories } from '../vehiclesData';
+import { bikeCategories, carCategories } from '../vehiclesData';
 
 export default function Navbar({
   isDark,
@@ -13,8 +13,7 @@ export default function Navbar({
   onSelectCategory,
   comparedCount,
   onOpenCompare,
-  onOpenSearch,
-  onOpenFit
+  onOpenSearch
 }) {
   const [exploreOpen, setExploreOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -39,80 +38,80 @@ export default function Navbar({
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-white/90 dark:bg-slate-950/90 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800 transition-colors duration-300">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between">
+    <header className="sticky top-0 z-40 bg-white/95 dark:bg-slate-950/95 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800/80 transition-colors duration-300">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between gap-4">
         
-        {/* LOGO */}
+        {/* 1. LOGO */}
         <button
           onClick={() => { onNavigate('home'); setMobileMenuOpen(false); }}
-          className="flex items-center gap-3 group text-left cursor-pointer"
+          className="flex items-center gap-2.5 group text-left cursor-pointer shrink-0"
         >
-          <div className="relative flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 via-indigo-600 to-emerald-400 p-[1.5px] shadow-lg shadow-cyan-500/20 group-hover:shadow-cyan-500/40 transition-all">
+          <div className="relative flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 via-blue-600 to-emerald-400 p-[1.5px] shadow-lg shadow-cyan-500/20 group-hover:shadow-cyan-500/40 transition-all">
             <div className="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center">
               <Zap className="w-5 h-5 text-cyan-400 fill-cyan-400/30 group-hover:scale-110 transition-transform" />
             </div>
           </div>
           <div className="flex flex-col">
-            <span className="font-extrabold text-xl tracking-tight bg-gradient-to-r from-slate-900 via-indigo-800 to-slate-900 dark:from-white dark:via-cyan-200 dark:to-indigo-300 bg-clip-text text-transparent">
+            <span className="font-black text-xl tracking-tight bg-gradient-to-r from-slate-950 via-slate-800 to-slate-950 dark:from-white dark:via-cyan-200 dark:to-indigo-200 bg-clip-text text-transparent">
               EVISTA
             </span>
-            <span className="text-[10px] font-semibold text-cyan-600 dark:text-cyan-400 tracking-widest uppercase -mt-1">
-              Next-Gen Showroom
+            <span className="text-[9px] font-bold text-cyan-600 dark:text-cyan-400 tracking-widest uppercase -mt-0.5">
+              EV Showroom
             </span>
           </div>
         </button>
 
-        {/* DESKTOP NAVIGATION */}
-        <nav className="hidden xl:flex items-center gap-6 text-sm font-semibold text-slate-600 dark:text-slate-300">
+        {/* 2. DESKTOP NAVIGATION (EVENLY SPACED, NO OVERFLOW) */}
+        <nav className="hidden lg:flex items-center gap-5 xl:gap-7 text-xs font-bold text-slate-600 dark:text-slate-300">
           <button
             onClick={() => onNavigate('home')}
-            className={`transition-colors cursor-pointer ${activePage === 'home' ? 'text-cyan-600 dark:text-cyan-400 font-bold' : 'hover:text-slate-900 dark:hover:text-white'}`}
+            className={`transition-colors cursor-pointer ${activePage === 'home' ? 'text-cyan-600 dark:text-cyan-400 font-black' : 'hover:text-slate-950 dark:hover:text-white'}`}
           >
             Home
           </button>
 
           <button
             onClick={() => onNavigate('bikes')}
-            className={`flex items-center gap-1.5 transition-colors cursor-pointer ${activePage === 'bikes' ? 'text-cyan-600 dark:text-cyan-400 font-bold' : 'hover:text-slate-900 dark:hover:text-white'}`}
+            className={`flex items-center gap-1.5 transition-colors cursor-pointer ${activePage === 'bikes' ? 'text-cyan-600 dark:text-cyan-400 font-black' : 'hover:text-slate-950 dark:hover:text-white'}`}
           >
-            <Bike className="w-4 h-4 text-cyan-500" />
-            Bikes
+            <Bike className="w-3.5 h-3.5 text-cyan-500" />
+            <span>Bikes</span>
           </button>
 
           <button
             onClick={() => onNavigate('cars')}
-            className={`flex items-center gap-1.5 transition-colors cursor-pointer ${activePage === 'cars' ? 'text-cyan-600 dark:text-cyan-400 font-bold' : 'hover:text-slate-900 dark:hover:text-white'}`}
+            className={`flex items-center gap-1.5 transition-colors cursor-pointer ${activePage === 'cars' ? 'text-indigo-600 dark:text-indigo-400 font-black' : 'hover:text-slate-950 dark:hover:text-white'}`}
           >
-            <Car className="w-4 h-4 text-indigo-500" />
-            Cars
+            <Car className="w-3.5 h-3.5 text-indigo-500" />
+            <span>Cars</span>
           </button>
 
-          {/* EXPLORE BY NEED MEGA-DROPDOWN */}
+          {/* EXPLORE DROPDOWN */}
           <div className="relative" ref={dropdownRef}>
             <button
               onClick={() => setExploreOpen(!exploreOpen)}
-              className={`flex items-center gap-1.5 py-2 transition-colors cursor-pointer ${exploreOpen ? 'text-cyan-600 dark:text-cyan-400 font-bold' : 'hover:text-slate-900 dark:hover:text-white'}`}
+              className={`flex items-center gap-1 py-2 transition-colors cursor-pointer ${exploreOpen ? 'text-cyan-600 dark:text-cyan-400 font-black' : 'hover:text-slate-950 dark:hover:text-white'}`}
             >
-              <span>Explore by Need</span>
-              <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${exploreOpen ? 'rotate-180 text-cyan-400' : ''}`} />
+              <span>Explore</span>
+              <ChevronDown className={`w-3 h-3 transition-transform duration-200 ${exploreOpen ? 'rotate-180 text-cyan-400' : ''}`} />
             </button>
 
             {exploreOpen && (
-              <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-[540px] bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 p-5 grid grid-cols-2 gap-4 animate-in fade-in zoom-in-95 duration-200 z-50">
+              <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-[540px] bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 p-5 grid grid-cols-2 gap-5 animate-in fade-in zoom-in-95 duration-200 z-50">
                 {/* Bike Categories Column */}
                 <div>
                   <div className="flex items-center gap-2 pb-2.5 mb-2.5 border-b border-slate-100 dark:border-slate-800">
                     <Bike className="w-4 h-4 text-cyan-500" />
-                    <span className="text-xs font-extrabold uppercase tracking-wider text-slate-900 dark:text-white">
+                    <span className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white">
                       Bike Categories
                     </span>
                   </div>
                   <div className="space-y-1">
-                    {lifestyleCategories.map((cat) => (
+                    {bikeCategories.map((cat) => (
                       <button
                         key={`bike-${cat.id}`}
                         onClick={() => handleCategoryClick(cat.id, 'bike')}
-                        className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-cyan-500/10 hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors text-left group"
+                        className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-cyan-500/10 hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors text-left group cursor-pointer"
                       >
                         <span className="flex items-center gap-2">
                           <span>{cat.emoji}</span>
@@ -128,16 +127,16 @@ export default function Navbar({
                 <div>
                   <div className="flex items-center gap-2 pb-2.5 mb-2.5 border-b border-slate-100 dark:border-slate-800">
                     <Car className="w-4 h-4 text-indigo-500" />
-                    <span className="text-xs font-extrabold uppercase tracking-wider text-slate-900 dark:text-white">
+                    <span className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white">
                       Car Categories
                     </span>
                   </div>
                   <div className="space-y-1">
-                    {lifestyleCategories.map((cat) => (
+                    {carCategories.map((cat) => (
                       <button
                         key={`car-${cat.id}`}
                         onClick={() => handleCategoryClick(cat.id, 'car')}
-                        className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-indigo-500/10 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors text-left group"
+                        className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-indigo-500/10 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors text-left group cursor-pointer"
                       >
                         <span className="flex items-center gap-2">
                           <span>{cat.emoji}</span>
@@ -152,53 +151,42 @@ export default function Navbar({
             )}
           </div>
 
+          {/* COMPARE LINK */}
           <button
             onClick={onOpenCompare}
-            className={`relative flex items-center gap-1.5 transition-colors cursor-pointer ${comparedCount > 0 ? 'text-indigo-600 dark:text-indigo-400 font-bold' : 'hover:text-slate-900 dark:hover:text-white'}`}
+            className={`relative flex items-center gap-1.5 transition-colors cursor-pointer ${comparedCount > 0 ? 'text-indigo-600 dark:text-indigo-400 font-black' : 'hover:text-slate-950 dark:hover:text-white'}`}
           >
-            <Scale className="w-4 h-4 text-indigo-500" />
+            <Scale className="w-3.5 h-3.5 text-indigo-500" />
             <span>Compare</span>
             {comparedCount > 0 && (
-              <span className="px-1.5 py-0.5 text-[10px] font-bold rounded-full bg-gradient-to-r from-cyan-500 to-indigo-600 text-white animate-pulse">
+              <span className="px-1.5 py-0.2 text-[10px] font-black rounded-full bg-gradient-to-r from-cyan-500 to-indigo-600 text-white animate-pulse">
                 {comparedCount}
               </span>
             )}
           </button>
 
+          {/* STUDENT OFFERS */}
           <button
             onClick={() => onNavigate('student-plan')}
-            className={`flex items-center gap-1.5 transition-colors cursor-pointer ${activePage === 'student-plan' ? 'text-emerald-500 font-bold' : 'hover:text-slate-900 dark:hover:text-white'}`}
+            className={`flex items-center gap-1.5 transition-colors cursor-pointer ${activePage === 'student-plan' ? 'text-emerald-500 font-black' : 'hover:text-slate-950 dark:hover:text-white'}`}
           >
-            <span className="px-1.5 py-0.5 text-[10px] font-bold rounded bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
-              ₹50/day
+            <span className="px-1.5 py-0.5 text-[9px] font-bold rounded bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
+              ₹50/mo
             </span>
-            Student Offers
+            <span>Student Plan</span>
           </button>
 
+          {/* OFFERS */}
           <button
             onClick={() => onNavigate('offers')}
-            className={`flex items-center gap-1.5 transition-colors cursor-pointer ${activePage === 'offers' ? 'text-cyan-500 font-bold' : 'hover:text-slate-900 dark:hover:text-white'}`}
+            className={`flex items-center gap-1 transition-colors cursor-pointer ${activePage === 'offers' ? 'text-cyan-500 font-black' : 'hover:text-slate-950 dark:hover:text-white'}`}
           >
-            <Tag className="w-3.5 h-3.5 text-amber-400" />
-            Offers
-          </button>
-
-          <button
-            onClick={() => onNavigate('about')}
-            className={`transition-colors cursor-pointer ${activePage === 'about' ? 'text-cyan-600 dark:text-cyan-400 font-bold' : 'hover:text-slate-900 dark:hover:text-white'}`}
-          >
-            About
-          </button>
-
-          <button
-            onClick={() => onNavigate('contact')}
-            className={`transition-colors cursor-pointer ${activePage === 'contact' ? 'text-cyan-600 dark:text-cyan-400 font-bold' : 'hover:text-slate-900 dark:hover:text-white'}`}
-          >
-            Contact
+            <Tag className="w-3 h-3 text-amber-400" />
+            <span>Offers</span>
           </button>
         </nav>
 
-        {/* RIGHT ACTION BUTTONS */}
+        {/* 3. RIGHT ACTION CONTROLS & CTA */}
         <div className="flex items-center gap-2.5">
           {/* Quick Search */}
           <button
@@ -207,16 +195,6 @@ export default function Navbar({
             title="Search models, brands, specs"
           >
             <Search className="w-4 h-4" />
-          </button>
-
-          {/* Rider Fit Studio */}
-          <button
-            onClick={onOpenFit}
-            className="hidden md:flex items-center gap-1.5 px-3 py-2 rounded-xl border border-indigo-500/30 bg-indigo-500/10 text-indigo-600 dark:text-indigo-300 text-xs font-bold hover:bg-indigo-500/20 transition-all cursor-pointer shadow-sm"
-            title="Check ergonomic stance & leg reach"
-          >
-            <User className="w-3.5 h-3.5 text-indigo-500" />
-            <span>Rider Fit Studio</span>
           </button>
 
           {/* Theme Toggle */}
@@ -228,10 +206,19 @@ export default function Navbar({
             {isDark ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-indigo-600" />}
           </button>
 
+          {/* Aligned Showroom CTA Button */}
+          <button
+            onClick={() => onNavigate('contact')}
+            className="hidden sm:flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-black text-xs shadow-md shadow-cyan-500/20 hover:shadow-cyan-500/35 transition-all cursor-pointer shrink-0"
+          >
+            <Calendar className="w-3.5 h-3.5" />
+            <span>Book Test Ride</span>
+          </button>
+
           {/* Mobile Menu Hamburger */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="xl:hidden p-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900 text-slate-700 dark:text-slate-200 cursor-pointer"
+            className="lg:hidden p-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900 text-slate-700 dark:text-slate-200 cursor-pointer"
           >
             {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
@@ -240,7 +227,7 @@ export default function Navbar({
 
       {/* MOBILE DRAWER */}
       {mobileMenuOpen && (
-        <div className="xl:hidden bg-slate-950/98 text-slate-100 border-b border-slate-800 px-6 py-6 space-y-4 max-h-[85vh] overflow-y-auto animate-in slide-in-from-top-4 duration-200">
+        <div className="lg:hidden bg-slate-950/98 text-slate-100 border-b border-slate-800 px-6 py-6 space-y-4 max-h-[85vh] overflow-y-auto animate-in slide-in-from-top-4 duration-200">
           <div className="grid grid-cols-2 gap-2">
             <button
               onClick={() => { onNavigate('home'); setMobileMenuOpen(false); }}
@@ -281,17 +268,17 @@ export default function Navbar({
               onClick={() => setMobileExploreExpanded(!mobileExploreExpanded)}
               className="w-full p-3.5 flex items-center justify-between text-sm font-bold text-cyan-300"
             >
-              <span>Explore by Need (Lifestyle)</span>
+              <span>Explore Categories</span>
               <ChevronDown className={`w-4 h-4 transition-transform ${mobileExploreExpanded ? 'rotate-180' : ''}`} />
             </button>
 
             {mobileExploreExpanded && (
-              <div className="p-3 pt-0 space-y-1.5">
-                <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider px-2 pt-2">
-                  Bikes
+              <div className="p-3 pt-0 space-y-2">
+                <div className="text-[10px] font-black text-cyan-400 uppercase tracking-wider px-2 pt-2">
+                  Electric Bikes
                 </div>
-                <div className="grid grid-cols-2 gap-1">
-                  {lifestyleCategories.map((cat) => (
+                <div className="grid grid-cols-2 gap-1.5">
+                  {bikeCategories.map((cat) => (
                     <button
                       key={`m-bike-${cat.id}`}
                       onClick={() => handleCategoryClick(cat.id, 'bike')}
@@ -302,11 +289,11 @@ export default function Navbar({
                   ))}
                 </div>
 
-                <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider px-2 pt-3">
-                  Cars
+                <div className="text-[10px] font-black text-indigo-400 uppercase tracking-wider px-2 pt-3">
+                  Electric Cars
                 </div>
-                <div className="grid grid-cols-2 gap-1">
-                  {lifestyleCategories.map((cat) => (
+                <div className="grid grid-cols-2 gap-1.5">
+                  {carCategories.map((cat) => (
                     <button
                       key={`m-car-${cat.id}`}
                       onClick={() => handleCategoryClick(cat.id, 'car')}
@@ -325,7 +312,7 @@ export default function Navbar({
               onClick={() => { onNavigate('student-plan'); setMobileMenuOpen(false); }}
               className="p-3 rounded-xl bg-emerald-950/40 border border-emerald-500/30 text-emerald-400 font-bold text-xs text-left"
             >
-              🎓 Student EV Plan (₹50/d)
+              🎓 Student Plan (₹50/mo)
             </button>
             <button
               onClick={() => { onNavigate('offers'); setMobileMenuOpen(false); }}
@@ -335,14 +322,12 @@ export default function Navbar({
             </button>
           </div>
 
-          <div className="pt-2 flex gap-2">
-            <button
-              onClick={() => { onOpenFit(); setMobileMenuOpen(false); }}
-              className="flex-1 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs flex items-center justify-center gap-1.5"
-            >
-              <User className="w-3.5 h-3.5" /> Rider Fit Studio
-            </button>
-          </div>
+          <button
+            onClick={() => { onNavigate('contact'); setMobileMenuOpen(false); }}
+            className="w-full py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-slate-950 font-black text-xs flex items-center justify-center gap-1.5 shadow-lg shadow-cyan-500/20"
+          >
+            <Calendar className="w-4 h-4" /> Book Free Test Ride
+          </button>
         </div>
       )}
     </header>

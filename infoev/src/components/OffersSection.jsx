@@ -13,7 +13,7 @@ export default function OffersSection({
       title: 'Student Electric Freedom Deal',
       category: 'Student Special',
       icon: <GraduationCap className="w-6 h-6 text-emerald-400" />,
-      badge: '₹50/day Concept',
+      badge: '₹50/month Concept',
       discount: 'Complimentary Smart Helmet + ₹4,000 Dorm Charger Credit',
       description: 'Exclusive for registered school and college students. Includes a DOT/ISI smart Bluetooth helmet and zero documentation processing fee.',
       terms: 'Valid with active student ID or guardian verification. Non-transferable.',

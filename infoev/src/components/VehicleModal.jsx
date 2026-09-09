@@ -1,23 +1,19 @@
 import { useState } from 'react';
 import {
-  X, CheckCircle2, ChevronRight, RotateCw, Image as ImageIcon,
-  Zap, Star, User, GraduationCap, Scale
+  X, CheckCircle2, ChevronRight,
+  Zap, Star, GraduationCap, Scale, BatteryCharging, Gauge, Clock, Users, ArrowRight
 } from 'lucide-react';
 import { formatINR } from '../vehiclesData';
-import Vehicle3DViewer from './Vehicle3DViewer';
-import Vehicle360Viewer from './Vehicle360Viewer';
 
 export default function VehicleModal({
   vehicle,
   onClose,
-  onOpenFit,
   onToggleCompare,
   isCompared,
   onOpenStudentPlan,
-  initialTab = 'details' // 'details' | 'specs' | 'enquire'
+  initialTab = 'details' // 'details' | 'enquire'
 }) {
-  const [activeVisual, setActiveVisual] = useState('3d'); // '3d' | '360' | 'photo'
-  const [activeTab, setActiveTab] = useState(initialTab); // 'details' | 'specs' | 'enquire'
+  const [activeTab, setActiveTab] = useState(initialTab);
   
   // Test drive / enquiry form
   const [bookingForm, setBookingForm] = useState({
@@ -52,6 +48,8 @@ export default function VehicleModal({
     }, 1200);
   };
 
+  const isStudentEligible = Boolean(vehicle.studentMonthlyPlan || vehicle.school || vehicle.college);
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-950/85 backdrop-blur-md overflow-y-auto">
       <div
@@ -61,22 +59,22 @@ export default function VehicleModal({
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-2 rounded-full bg-slate-100/80 dark:bg-slate-800/80 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-300 z-30 transition-colors cursor-pointer"
+          className="absolute top-4 right-4 p-2 rounded-full bg-slate-100/90 dark:bg-slate-800/90 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-300 z-30 transition-colors cursor-pointer"
         >
           <X className="w-5 h-5" />
         </button>
 
-        {/* LEFT COLUMN: VISUAL EXPERIENCE & STUDIO VIEWER */}
-        <div className="md:w-1/2 p-6 sm:p-8 flex flex-col justify-between border-b md:border-b-0 md:border-r border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/40 overflow-y-auto">
+        {/* LEFT COLUMN: VEHICLE IMAGE STAGE & SPEC METRICS */}
+        <div className="md:w-1/2 p-6 sm:p-8 flex flex-col justify-between border-b md:border-b-0 md:border-r border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-950/50 overflow-y-auto">
           <div>
             {/* Header Identity */}
             <div className="flex items-center justify-between gap-2 mb-2">
-              <span className="px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-widest bg-cyan-500/20 text-cyan-600 dark:text-cyan-400 border border-cyan-500/30">
+              <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-cyan-500/15 text-cyan-700 dark:text-cyan-400 border border-cyan-500/30">
                 {vehicle.brandName} • {vehicle.type}
               </span>
               <div className="flex items-center gap-1 text-amber-500 text-xs font-bold">
                 <Star className="w-3.5 h-3.5 fill-current" />
-                <span>{vehicle.rating} ({vehicle.reviewCount || 120} reviews)</span>
+                <span>{vehicle.rating} ({vehicle.reviewCount || 150} reviews)</span>
               </div>
             </div>
 
@@ -84,80 +82,20 @@ export default function VehicleModal({
               {vehicle.name}
             </h3>
 
-            {/* Visual View Switcher (3D vs 360° vs Clean Photo) */}
-            <div className="flex items-center gap-1 p-1 bg-slate-200/70 dark:bg-slate-800/90 rounded-xl my-4 self-start">
-              <button
-                onClick={() => setActiveVisual('3d')}
-                className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer ${
-                  activeVisual === '3d'
-                    ? 'bg-cyan-500 text-white shadow-md'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-white'
-                }`}
-              >
-                <RotateCw className="w-3.5 h-3.5" />
-                3D Model
-              </button>
-
-              <button
-                onClick={() => setActiveVisual('360')}
-                className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer ${
-                  activeVisual === '360'
-                    ? 'bg-cyan-500 text-white shadow-md'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-white'
-                }`}
-              >
-                <RotateCw className="w-3.5 h-3.5 text-amber-400" />
-                360° Turntable
-              </button>
-
-              <button
-                onClick={() => setActiveVisual('photo')}
-                className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer ${
-                  activeVisual === 'photo'
-                    ? 'bg-cyan-500 text-white shadow-md'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-white'
-                }`}
-              >
-                <ImageIcon className="w-3.5 h-3.5" />
-                Studio Photo
-              </button>
+            {/* Clean Vehicle Showroom Image Display */}
+            <div className="relative w-full flex items-center justify-center min-h-[220px] sm:min-h-[250px] my-5 p-6 rounded-3xl bg-white dark:bg-slate-900/70 border border-slate-200/80 dark:border-slate-800 shadow-sm">
+              <img
+                src={vehicle.image}
+                alt={vehicle.name}
+                className="max-h-48 sm:max-h-56 max-w-[90%] object-contain filter drop-shadow-xl"
+              />
             </div>
 
-            {/* Main Visual Display Stage */}
-            <div className="relative w-full flex items-center justify-center min-h-[260px] my-2">
-              {activeVisual === '3d' && (
-                <div className="w-full rounded-2xl overflow-hidden bg-slate-900/60 border border-slate-800">
-                  <Vehicle3DViewer
-                    vehicle={vehicle}
-                    height="270px"
-                    showControls={true}
-                  />
-                </div>
-              )}
-
-              {activeVisual === '360' && (
-                <Vehicle360Viewer
-                  vehicle={vehicle}
-                  height="270px"
-                />
-              )}
-
-              {activeVisual === 'photo' && (
-                <div className="w-full h-64 flex items-center justify-center p-4 bg-slate-950/40 rounded-2xl border border-slate-800">
-                  <img
-                    src={vehicle.image}
-                    alt={vehicle.name}
-                    className="max-h-52 max-w-[85%] object-contain drop-shadow-2xl"
-                  />
-                </div>
-              )}
-            </div>
-
-            {/* Available Paint Finishes */}
+            {/* Available Colorways */}
             {vehicle.colors && vehicle.colors.length > 0 && (
-              <div className="pt-3 flex items-center gap-2">
-                <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-                  Colorways:
+              <div className="flex items-center gap-2 mb-4">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                  Available Colorways:
                 </span>
                 <div className="flex items-center gap-1.5">
                   {vehicle.colors.map((c, i) => (
@@ -171,15 +109,42 @@ export default function VehicleModal({
                 </div>
               </div>
             )}
+
+            {/* Price & EMI Highlight Box */}
+            <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm grid grid-cols-2 gap-4">
+              <div>
+                <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 block">
+                  Ex-Showroom Price
+                </span>
+                <div className="text-2xl font-black text-slate-900 dark:text-white mt-0.5">
+                  {formatINR(vehicle.price)}
+                </div>
+                <span className="text-[10px] text-slate-400 block">Approx. ${vehicle.priceUSD} USD</span>
+              </div>
+
+              <div>
+                <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 block">
+                  Standard EMI From
+                </span>
+                <div className="text-xl font-black text-cyan-600 dark:text-cyan-400 mt-0.5">
+                  {vehicle.emi}
+                </div>
+                {isStudentEligible && (
+                  <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold block">
+                    Student Plan: From ₹50/month
+                  </span>
+                )}
+              </div>
+            </div>
           </div>
 
-          {/* Bottom Left Utility CTAs */}
-          <div className="pt-4 border-t border-slate-200 dark:border-slate-800 grid grid-cols-2 gap-2 mt-4">
+          {/* Action CTAs Bottom Left */}
+          <div className="pt-4 border-t border-slate-200 dark:border-slate-800 grid grid-cols-2 gap-2 mt-5">
             <button
               onClick={() => onToggleCompare(vehicle.id)}
-              className={`py-2 px-3 rounded-xl border text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+              className={`py-2.5 px-3 rounded-xl border text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
                 isCompared
-                  ? 'bg-indigo-600 border-indigo-500 text-white'
+                  ? 'bg-indigo-600 border-indigo-500 text-white shadow-md'
                   : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-indigo-500'
               }`}
             >
@@ -187,201 +152,187 @@ export default function VehicleModal({
               <span>{isCompared ? 'In Compare' : 'Add to Compare'}</span>
             </button>
 
-            <button
-              onClick={() => {
-                onClose();
-                if (onOpenFit) onOpenFit(vehicle);
-              }}
-              className="py-2 px-3 rounded-xl bg-indigo-50 dark:bg-indigo-950/40 hover:bg-indigo-100 text-indigo-700 dark:text-indigo-300 border border-indigo-300 dark:border-indigo-800 text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
-            >
-              <User className="w-3.5 h-3.5" />
-              <span>Rider Fit Check</span>
-            </button>
+            {isStudentEligible ? (
+              <button
+                onClick={() => {
+                  onClose();
+                  onOpenStudentPlan();
+                }}
+                className="py-2.5 px-3 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30 text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+              >
+                <GraduationCap className="w-4 h-4" />
+                <span>Check Eligibility</span>
+              </button>
+            ) : (
+              <button
+                onClick={() => setActiveTab('enquire')}
+                className="py-2.5 px-3 rounded-xl bg-slate-900 dark:bg-slate-800 text-white hover:bg-cyan-500 hover:text-slate-950 text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+              >
+                <span>Book Test Ride</span>
+              </button>
+            )}
           </div>
         </div>
 
-        {/* RIGHT COLUMN: SPECS, COST SAVINGS, SUITABILITY, AND BOOKING */}
+        {/* RIGHT COLUMN: FULL SPECIFICATIONS, ADVANTAGES, RATINGS & ENQUIRY */}
         <div className="md:w-1/2 p-6 sm:p-8 flex flex-col justify-between overflow-y-auto">
           <div>
-            {/* Top Navigation Tabs */}
+            {/* Top View Selector Tabs */}
             <div className="flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-3 mb-5">
               <button
                 onClick={() => setActiveTab('details')}
-                className={`px-3 py-1.5 text-xs font-black rounded-lg transition-all cursor-pointer ${
+                className={`px-4 py-1.5 text-xs font-black rounded-xl transition-all cursor-pointer ${
                   activeTab === 'details'
-                    ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-sm'
+                    ? 'bg-slate-950 dark:bg-white text-white dark:text-slate-950 shadow-sm'
                     : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
-                Overview & Cost
-              </button>
-              <button
-                onClick={() => setActiveTab('specs')}
-                className={`px-3 py-1.5 text-xs font-black rounded-lg transition-all cursor-pointer ${
-                  activeTab === 'specs'
-                    ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-sm'
-                    : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
-                }`}
-              >
-                Full Specs Matrix
+                Overview & Specs
               </button>
               <button
                 onClick={() => setActiveTab('enquire')}
-                className={`px-3 py-1.5 text-xs font-black rounded-lg transition-all cursor-pointer ${
+                className={`px-4 py-1.5 text-xs font-black rounded-xl transition-all cursor-pointer flex items-center gap-1.5 ${
                   activeTab === 'enquire'
-                    ? 'bg-cyan-500 text-white shadow-sm'
+                    ? 'bg-cyan-500 text-slate-950 shadow-sm font-black'
                     : 'text-cyan-600 dark:text-cyan-400 hover:text-cyan-300'
                 }`}
               >
-                Book Test Ride
+                <span>Book Test Ride</span>
+                <ChevronRight className="w-3.5 h-3.5" />
               </button>
             </div>
 
-            {/* TAB 1: OVERVIEW & RUNNING COST */}
+            {/* VIEW 1: OVERVIEW, FULL SPECS, ADVANTAGES & SUITABILITY */}
             {activeTab === 'details' && (
               <div className="space-y-5 animate-in fade-in duration-150">
                 <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
                   {vehicle.description}
                 </p>
 
-                {/* Price & Monthly/Daily Installment Banner */}
-                <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/80 grid grid-cols-2 gap-4">
-                  <div>
-                    <span className="text-[10px] font-bold uppercase text-slate-400 block">
-                      Showroom Price
-                    </span>
-                    <span className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
-                      {formatINR(vehicle.price)}
-                    </span>
-                    <span className="text-[10px] text-slate-400 block mt-0.5">Approx. ${vehicle.priceUSD} USD</span>
-                  </div>
-
-                  <div>
-                    <span className="text-[10px] font-bold uppercase text-slate-400 block">
-                      Estimated Monthly Installment
-                    </span>
-                    <span className="text-lg sm:text-xl font-bold text-cyan-600 dark:text-cyan-400">
-                      {vehicle.emi}
-                    </span>
-                    {vehicle.studentDailyPlan && (
-                      <span className="text-[10px] text-emerald-500 font-bold block mt-0.5">
-                        Student Plan: ₹{vehicle.studentDailyPlan.schoolDaily}/day
-                      </span>
-                    )}
-                  </div>
-                </div>
-
-                {/* RUNNING COST COMPARISON (PETROL VS EV) */}
-                <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-950 dark:text-emerald-100">
-                  <div className="flex items-center gap-1.5 mb-2 font-black text-xs text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
-                    <Zap className="w-4 h-4" />
-                    <span>Running Cost & Savings vs Petrol</span>
-                  </div>
-                  <div className="grid grid-cols-3 gap-2 text-xs">
-                    <div>
-                      <span className="text-[10px] text-slate-500 dark:text-slate-400 block">EV Power:</span>
-                      <strong className="text-emerald-600 dark:text-emerald-300">
-                        {vehicle.petrolComparison?.runningCostEV || '₹0.25/km'}
-                      </strong>
-                    </div>
-                    <div>
-                      <span className="text-[10px] text-slate-500 dark:text-slate-400 block">Petrol Equivalent:</span>
-                      <strong className="text-rose-500 dark:text-rose-400">
-                        {vehicle.petrolComparison?.runningCostPetrol || '₹2.40/km'}
-                      </strong>
-                    </div>
-                    <div>
-                      <span className="text-[10px] text-slate-500 dark:text-slate-400 block">Annual Retention:</span>
-                      <strong className="text-emerald-500 dark:text-emerald-400 font-black">
-                        {vehicle.petrolComparison?.annualSavings || '₹32,500/yr'}
-                      </strong>
-                    </div>
-                  </div>
-                </div>
-
-                {/* CATEGORY SUITABILITY RATINGS */}
-                <div className="pt-2">
-                  <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 block mb-2">
-                    Lifestyle Suitability Grading:
+                {/* 1. KEY SPECIFICATIONS MATRIX */}
+                <div>
+                  <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-2">
+                    Official Specifications
                   </span>
                   <div className="grid grid-cols-2 gap-2 text-xs">
-                    <div className="flex justify-between items-center p-2 rounded-xl bg-slate-50 dark:bg-slate-850 border border-slate-200/60 dark:border-slate-800">
-                      <span className="text-slate-600 dark:text-slate-400 font-medium">Daily Commute:</span>
+                    <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
+                      <span className="text-[10px] text-slate-400 block font-semibold flex items-center gap-1">
+                        <BatteryCharging className="w-3 h-3 text-emerald-500" /> Driving Range
+                      </span>
+                      <strong className="text-slate-900 dark:text-white text-sm">{vehicle.range} km</strong>
+                    </div>
+                    <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
+                      <span className="text-[10px] text-slate-400 block font-semibold flex items-center gap-1">
+                        <Zap className="w-3 h-3 text-indigo-400" /> Battery Chemistry
+                      </span>
+                      <strong className="text-slate-900 dark:text-white text-sm">{vehicle.batteryCapacity} kWh</strong>
+                    </div>
+                    <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
+                      <span className="text-[10px] text-slate-400 block font-semibold flex items-center gap-1">
+                        <Gauge className="w-3 h-3 text-cyan-500" /> Top Speed
+                      </span>
+                      <strong className="text-slate-900 dark:text-white text-sm">{vehicle.topSpeed} km/h</strong>
+                    </div>
+                    <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
+                      <span className="text-[10px] text-slate-400 block font-semibold flex items-center gap-1">
+                        <Clock className="w-3 h-3 text-amber-500" /> Recharging Duration
+                      </span>
+                      <strong className="text-slate-900 dark:text-white text-xs">{vehicle.chargingTime}</strong>
+                    </div>
+                    <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
+                      <span className="text-[10px] text-slate-400 block font-semibold">Motor Power & Output</span>
+                      <strong className="text-slate-900 dark:text-white text-xs">{vehicle.power}</strong>
+                    </div>
+                    <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
+                      <span className="text-[10px] text-slate-400 block font-semibold flex items-center gap-1">
+                        <Users className="w-3 h-3 text-purple-400" /> Seating & Weight
+                      </span>
+                      <strong className="text-slate-900 dark:text-white text-xs">{vehicle.seating} Seats • {vehicle.weight} kg</strong>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 2. WHY CHOOSE THIS EV? (3-5 ADVANTAGES) */}
+                <div className="p-4 rounded-2xl bg-cyan-500/5 dark:bg-slate-850 border border-cyan-500/20">
+                  <h4 className="font-black text-xs text-cyan-700 dark:text-cyan-400 uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
+                    <CheckCircle2 className="w-4 h-4 text-cyan-500" />
+                    <span>Why Choose This EV?</span>
+                  </h4>
+                  <ul className="space-y-1.5 text-xs text-slate-700 dark:text-slate-300">
+                    {vehicle.highlights ? vehicle.highlights.slice(0, 4).map((h, i) => (
+                      <li key={i} className="flex items-start gap-2">
+                        <span className="text-cyan-500 font-bold">•</span>
+                        <span>{h}</span>
+                      </li>
+                    )) : (
+                      <>
+                        <li className="flex items-start gap-2">
+                          <span className="text-cyan-500 font-bold">•</span>
+                          <span>Zero tailpipe carbon emissions with rapid low-cost charging</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <span className="text-cyan-500 font-bold">•</span>
+                          <span>Over 70% lower running cost than equivalent petrol model</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <span className="text-cyan-500 font-bold">•</span>
+                          <span>8 Years / 1,60,000 km manufacturer battery guarantee</span>
+                        </li>
+                      </>
+                    )}
+                  </ul>
+                </div>
+
+                {/* 3. BEST FOR: SUITABILITY RATINGS */}
+                <div>
+                  <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-2">
+                    Best For (Suitability Rating)
+                  </span>
+                  <div className="grid grid-cols-2 gap-2 text-xs">
+                    <div className="flex justify-between items-center p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-800">
+                      <span className="text-slate-600 dark:text-slate-400 font-medium">Daily Usage</span>
                       <span className="font-bold text-amber-500">★★★★★</span>
                     </div>
-                    <div className="flex justify-between items-center p-2 rounded-xl bg-slate-50 dark:bg-slate-850 border border-slate-200/60 dark:border-slate-800">
-                      <span className="text-slate-600 dark:text-slate-400 font-medium">Long Highway:</span>
-                      <span className="font-bold text-amber-500">{vehicle.range > 200 ? '★★★★★' : '★★★★☆'}</span>
+                    <div className="flex justify-between items-center p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-800">
+                      <span className="text-slate-600 dark:text-slate-400 font-medium">Long Drive</span>
+                      <span className="font-bold text-amber-500">{vehicle.range > 250 ? '★★★★★' : '★★★★☆'}</span>
                     </div>
-                    <div className="flex justify-between items-center p-2 rounded-xl bg-slate-50 dark:bg-slate-850 border border-slate-200/60 dark:border-slate-800">
-                      <span className="text-slate-600 dark:text-slate-400 font-medium">Student Friendly:</span>
-                      <span className="font-bold text-amber-500">{vehicle.studentDailyPlan ? '★★★★★' : '★★★☆☆'}</span>
+                    <div className="flex justify-between items-center p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-800">
+                      <span className="text-slate-600 dark:text-slate-400 font-medium">College</span>
+                      <span className="font-bold text-amber-500">{isStudentEligible ? '★★★★★' : '★★★★☆'}</span>
                     </div>
-                    <div className="flex justify-between items-center p-2 rounded-xl bg-slate-50 dark:bg-slate-850 border border-slate-200/60 dark:border-slate-800">
-                      <span className="text-slate-600 dark:text-slate-400 font-medium">Family Utility:</span>
-                      <span className="font-bold text-amber-500">{vehicle.seating >= 2 ? '★★★★☆' : '★★★☆☆'}</span>
+                    <div className="flex justify-between items-center p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-800">
+                      <span className="text-slate-600 dark:text-slate-400 font-medium">Family</span>
+                      <span className="font-bold text-amber-500">{vehicle.seating >= 4 ? '★★★★★' : (vehicle.seating >= 2 ? '★★★★☆' : '★★★☆☆')}</span>
                     </div>
                   </div>
                 </div>
-              </div>
-            )}
 
-            {/* TAB 2: FULL SPECS MATRIX */}
-            {activeTab === 'specs' && (
-              <div className="space-y-4 animate-in fade-in duration-150">
-                <div className="grid grid-cols-2 gap-2.5 text-xs">
-                  <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
-                    <span className="text-[10px] text-slate-400 block font-semibold">Single-Charge Range</span>
-                    <strong className="text-slate-900 dark:text-white text-sm">{vehicle.range} km</strong>
-                  </div>
-                  <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
-                    <span className="text-[10px] text-slate-400 block font-semibold">Top Speed</span>
-                    <strong className="text-slate-900 dark:text-white text-sm">{vehicle.topSpeed} km/h</strong>
-                  </div>
-                  <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
-                    <span className="text-[10px] text-slate-400 block font-semibold">Battery Chemistry</span>
-                    <strong className="text-slate-900 dark:text-white text-sm">{vehicle.batteryCapacity} kWh</strong>
-                  </div>
-                  <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
-                    <span className="text-[10px] text-slate-400 block font-semibold">Motor Power</span>
-                    <strong className="text-slate-900 dark:text-white text-sm">{vehicle.power}</strong>
-                  </div>
-                  <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
-                    <span className="text-[10px] text-slate-400 block font-semibold">Recharging Duration</span>
-                    <span className="text-slate-700 dark:text-slate-300 font-medium">{vehicle.chargingTime}</span>
-                  </div>
-                  <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
-                    <span className="text-[10px] text-slate-400 block font-semibold">Kerb Weight & Seating</span>
-                    <span className="text-slate-700 dark:text-slate-300 font-medium">{vehicle.weight} kg • {vehicle.seating} Seats</span>
-                  </div>
-                </div>
-
-                {/* Key Features Highlights */}
-                {vehicle.highlights && (
-                  <div className="pt-2">
-                    <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 block mb-2">
-                      Key Highlights:
+                {/* 4. PAYMENT OPTIONS CONCEPT */}
+                <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-xs text-emerald-950 dark:text-emerald-200">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="font-black uppercase tracking-wider text-[11px] text-emerald-700 dark:text-emerald-400 flex items-center gap-1.5">
+                      <GraduationCap className="w-4 h-4" />
+                      Student Monthly Payment Concept
                     </span>
-                    <ul className="space-y-1.5 text-xs text-slate-600 dark:text-slate-300">
-                      {vehicle.highlights.map((h, i) => (
-                        <li key={i} className="flex items-start gap-2">
-                          <CheckCircle2 className="w-3.5 h-3.5 text-cyan-500 shrink-0 mt-0.5" />
-                          <span>{h}</span>
-                        </li>
-                      ))}
-                    </ul>
+                    <span className="text-[10px] font-bold bg-emerald-500/20 text-emerald-800 dark:text-emerald-300 px-2 py-0.5 rounded-full">
+                      Plan A / B
+                    </span>
                   </div>
-                )}
+                  <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-[11px]">
+                    Eligible for promotional student monthly plans starting from <strong>₹50 / month</strong> (Plan A with Guardian Approval) or <strong>₹100 / month</strong> (Plan B with College ID).
+                  </p>
+                </div>
               </div>
             )}
 
-            {/* TAB 3: BOOK TEST RIDE / ENQUIRY FORM */}
+            {/* VIEW 2: BOOK TEST RIDE FORM */}
             {activeTab === 'enquire' && (
               <div className="animate-in fade-in duration-150">
                 {isSuccess ? (
-                  <div className="p-6 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-center space-y-3">
+                  <div className="p-8 rounded-3xl bg-emerald-500/10 border border-emerald-500/30 text-center space-y-3 my-4">
                     <CheckCircle2 className="w-12 h-12 text-emerald-500 mx-auto" />
-                    <h4 className="text-lg font-black text-slate-900 dark:text-white">
+                    <h4 className="text-xl font-black text-slate-900 dark:text-white">
                       Reservation Request Received!
                     </h4>
                     <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed max-w-sm mx-auto">
@@ -389,12 +340,14 @@ export default function VehicleModal({
                     </p>
                   </div>
                 ) : (
-                  <form onSubmit={handleBookingSubmit} className="space-y-3">
+                  <form onSubmit={handleBookingSubmit} className="space-y-3.5 my-2">
                     <div className="flex justify-between items-center mb-1">
                       <span className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">
-                        Book a Doorstep / Showroom Test Ride
+                        Doorstep / Showroom Test Ride
                       </span>
-                      <span className="text-[10px] text-emerald-500 font-bold">100% Free</span>
+                      <span className="text-[10px] text-emerald-500 font-bold bg-emerald-500/10 px-2 py-0.5 rounded-full">
+                        100% Free Experience
+                      </span>
                     </div>
 
                     <div className="grid grid-cols-2 gap-2.5">
@@ -405,7 +358,7 @@ export default function VehicleModal({
                         onChange={handleInputChange}
                         placeholder="Your Full Name *"
                         required
-                        className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs text-slate-900 dark:text-slate-100 outline-none focus:ring-1 focus:ring-cyan-500"
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs text-slate-900 dark:text-slate-100 outline-none focus:ring-2 focus:ring-cyan-500"
                       />
                       <input
                         type="tel"
@@ -414,7 +367,7 @@ export default function VehicleModal({
                         onChange={handleInputChange}
                         placeholder="Phone Number *"
                         required
-                        className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs text-slate-900 dark:text-slate-100 outline-none focus:ring-1 focus:ring-cyan-500"
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs text-slate-900 dark:text-slate-100 outline-none focus:ring-2 focus:ring-cyan-500"
                       />
                     </div>
 
@@ -425,21 +378,21 @@ export default function VehicleModal({
                         value={bookingForm.email}
                         onChange={handleInputChange}
                         placeholder="Email Address"
-                        className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs text-slate-900 dark:text-slate-100 outline-none focus:ring-1 focus:ring-cyan-500"
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs text-slate-900 dark:text-slate-100 outline-none focus:ring-2 focus:ring-cyan-500"
                       />
                       <input
                         type="date"
                         name="date"
                         value={bookingForm.date}
                         onChange={handleInputChange}
-                        className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs text-slate-900 dark:text-slate-100 outline-none focus:ring-1 focus:ring-cyan-500"
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs text-slate-900 dark:text-slate-100 outline-none focus:ring-2 focus:ring-cyan-500"
                       />
                     </div>
 
                     <button
                       type="submit"
                       disabled={isSubmitting}
-                      className="w-full mt-2 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-extrabold text-xs shadow-lg shadow-cyan-500/20 transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
+                      className="w-full mt-2 py-3.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-black text-xs shadow-lg shadow-cyan-500/20 transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
                     >
                       {isSubmitting ? 'Submitting Reservation...' : 'Confirm Showroom Booking'}
                       <ChevronRight className="w-4 h-4" />
@@ -452,28 +405,16 @@ export default function VehicleModal({
 
           {/* Bottom Action Strip */}
           <div className="pt-4 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between gap-3 mt-6">
-            {vehicle.studentDailyPlan ? (
-              <button
-                onClick={() => {
-                  onClose();
-                  onOpenStudentPlan();
-                }}
-                className="text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1 cursor-pointer"
-              >
-                <GraduationCap className="w-4 h-4" />
-                <span>Check Student Plan (₹{vehicle.studentDailyPlan.schoolDaily}/d)</span>
-              </button>
-            ) : (
-              <span className="text-[11px] text-slate-400">
-                Official Warranty: 8 Years / 1,60,000 km
-              </span>
-            )}
+            <span className="text-[11px] text-slate-400">
+              Showroom Warranty: 8 Years / 1,60,000 km
+            </span>
 
             <button
               onClick={() => setActiveTab('enquire')}
-              className="px-5 py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-black text-xs shadow-md transition-all cursor-pointer"
+              className="px-6 py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-black text-xs shadow-md transition-all cursor-pointer flex items-center gap-1.5"
             >
-              Enquire Now
+              <span>Enquire Now</span>
+              <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
         </div>

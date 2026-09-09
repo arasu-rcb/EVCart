@@ -1,16 +1,16 @@
 import { useState, useEffect } from 'react';
 import {
-  Bike, Car, Search, ArrowUpDown, Compass
+  Search, ArrowUpDown, Compass, ArrowRight
 } from 'lucide-react';
 import { bikesData, carsData, bikeBrands, carBrands } from './vehiclesData';
 
 // Core Showcase Components
 import Navbar from './components/Navbar';
 import HeroSection from './components/HeroSection';
+import VehicleTypeSelector from './components/VehicleTypeSelector';
 import ExploreByNeed from './components/ExploreByNeed';
 import VehicleCard from './components/VehicleCard';
 import VehicleModal from './components/VehicleModal';
-import RiderFitModal from './components/RiderFitModal';
 
 // Upgraded Comparison & Student Modules
 import CompareDrawer from './components/CompareDrawer';
@@ -55,7 +55,7 @@ export default function App() {
   // Navigation / Page View: 'home' | 'bikes' | 'cars' | 'student-plan' | 'offers' | 'about' | 'contact'
   const [activePage, setActivePage] = useState('home');
 
-  // Filter & Search states
+  // Filter & Search states (User chooses vehicle type FIRST: 'bike' | 'car')
   const [activeCategoryTab, setActiveCategoryTab] = useState('bike'); // 'bike' | 'car'
   const [selectedBrand, setSelectedBrand] = useState('all');
   const [selectedLifestyle, setSelectedLifestyle] = useState('daily');
@@ -66,7 +66,6 @@ export default function App() {
   // Modals & Drawers state
   const [selectedVehicle, setSelectedVehicle] = useState(null);
   const [initialVehicleModalTab, setInitialVehicleModalTab] = useState('details');
-  const [fitVehicle, setFitVehicle] = useState(null);
   const [isCompareModalOpen, setIsCompareModalOpen] = useState(false);
   const [isCalculatorOpen, setIsCalculatorOpen] = useState(false);
   const [calculatorStudentType, setCalculatorStudentType] = useState('college');
@@ -114,6 +113,13 @@ export default function App() {
   // Navigation handlers
   const handleNavigate = (page) => {
     setActivePage(page);
+    if (page === 'bikes') {
+      setActiveCategoryTab('bike');
+      setSelectedBrand('all');
+    } else if (page === 'cars') {
+      setActiveCategoryTab('car');
+      setSelectedBrand('all');
+    }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -129,7 +135,7 @@ export default function App() {
     }, 100);
   };
 
-  // Active dataset for Showroom Catalog
+  // Active dataset strictly segregated by chosen vehicle type
   const activeDataset = activeCategoryTab === 'bike' ? bikesData : carsData;
   const activeBrands = activeCategoryTab === 'bike' ? bikeBrands : carBrands;
 
@@ -140,7 +146,7 @@ export default function App() {
       vehicle.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       vehicle.brandName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       vehicle.type.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesStudent = !studentOnlyFilter || Boolean(vehicle.studentDailyPlan || vehicle.school || vehicle.college);
+    const matchesStudent = !studentOnlyFilter || Boolean(vehicle.studentMonthlyPlan || vehicle.school || vehicle.college);
     return matchesBrand && matchesSearch && matchesStudent;
   });
 
@@ -170,7 +176,6 @@ export default function App() {
         comparedCount={comparedVehicleIds.length}
         onOpenCompare={() => setIsCompareModalOpen(true)}
         onOpenSearch={() => setIsSearchOpen(true)}
-        onOpenFit={() => setFitVehicle(bikesData[0])}
       />
 
       {/* PAGE VIEW ROUTING */}
@@ -183,20 +188,32 @@ export default function App() {
             onExploreBikes={() => {
               setActiveCategoryTab('bike');
               setSelectedBrand('all');
-              const el = document.getElementById('catalog-showroom');
+              const el = document.getElementById('vehicle-type-selection');
               if (el) el.scrollIntoView({ behavior: 'smooth' });
             }}
             onExploreCars={() => {
               setActiveCategoryTab('car');
               setSelectedBrand('all');
-              const el = document.getElementById('catalog-showroom');
+              const el = document.getElementById('vehicle-type-selection');
               if (el) el.scrollIntoView({ behavior: 'smooth' });
             }}
             onFindPerfectEV={() => setIsRecommendationOpen(true)}
           />
 
-          {/* 3. EXPLORE BY NEED (LIFESTYLE SECTION) */}
+          {/* 3. VEHICLE TYPE SELECTION ("WHAT ARE YOU LOOKING FOR?") */}
+          <VehicleTypeSelector
+            selectedType={activeCategoryTab}
+            onSelectType={(type) => {
+              setActiveCategoryTab(type);
+              setSelectedBrand('all');
+            }}
+            bikesCount={bikesData.length}
+            carsCount={carsData.length}
+          />
+
+          {/* 4. EXPLORE BY NEED (LIFESTYLE SECTION DEDICATED TO SELECTED TYPE) */}
           <ExploreByNeed
+            vehicleType={activeCategoryTab}
             selectedCategory={selectedLifestyle}
             onSelectCategory={(catId) => setSelectedLifestyle(catId)}
             onViewVehicle={(v, tab) => {
@@ -205,49 +222,39 @@ export default function App() {
             }}
             onToggleCompare={toggleCompare}
             comparedVehicleIds={comparedVehicleIds}
-            onOpenFit={(v) => setFitVehicle(v)}
           />
 
-          {/* 4. SHOWROOM CATALOG GRID (BIKES & CARS WITH FILTERS) */}
+          {/* 5. SHOWROOM FLEET CATALOG (STRICTLY SEGREGATED BY SELECTED TYPE) */}
           <section id="catalog-showroom" className="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full text-left">
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
               <div>
                 <span className="text-xs font-bold uppercase tracking-wider text-cyan-600 dark:text-cyan-400">
-                  Curated Showroom Floor
+                  {activeCategoryTab === 'bike' ? 'Two-Wheeler Showroom Floor' : 'Automobile Showroom Floor'}
                 </span>
                 <h2 className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white mt-1">
-                  Explore Full Fleet Catalog
+                  {activeCategoryTab === 'bike' ? 'Electric Bike Lineup' : 'Electric Car Lineup'}
                 </h2>
                 <p className="text-slate-500 dark:text-slate-400 text-xs sm:text-sm mt-1">
-                  Browse {bikesData.length} electric two-wheelers and {carsData.length} premium electric cars with transparent pricing.
+                  {activeCategoryTab === 'bike'
+                    ? `Showing ${bikesData.length} smart electric scooters, commuters, and performance superbikes.`
+                    : `Showing ${carsData.length} premium electric sedans, urban hatchbacks, and long-range SUVs.`
+                  }
                 </p>
               </div>
 
-              {/* Category Selector Tabs (Bikes vs Cars) */}
-              <div className="inline-flex p-1.5 bg-slate-200/70 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl self-start md:self-auto">
-                <button
-                  onClick={() => { setActiveCategoryTab('bike'); setSelectedBrand('all'); }}
-                  className={`flex items-center gap-2 px-5 py-2 rounded-xl font-black text-xs sm:text-sm transition-all cursor-pointer ${
-                    activeCategoryTab === 'bike'
-                      ? 'bg-white dark:bg-cyan-500 text-slate-950 dark:text-slate-950 shadow-md scale-102'
-                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                  }`}
-                >
-                  <Bike className="w-4 h-4" />
-                  Electric Bikes ({bikesData.length})
-                </button>
-                <button
-                  onClick={() => { setActiveCategoryTab('car'); setSelectedBrand('all'); }}
-                  className={`flex items-center gap-2 px-5 py-2 rounded-xl font-black text-xs sm:text-sm transition-all cursor-pointer ${
-                    activeCategoryTab === 'car'
-                      ? 'bg-white dark:bg-indigo-600 text-slate-950 dark:text-white shadow-md scale-102'
-                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                  }`}
-                >
-                  <Car className="w-4 h-4" />
-                  Electric Cars ({carsData.length})
-                </button>
-              </div>
+              {/* Quick Switch Segment Link */}
+              <button
+                type="button"
+                onClick={() => {
+                  const newType = activeCategoryTab === 'bike' ? 'car' : 'bike';
+                  setActiveCategoryTab(newType);
+                  setSelectedBrand('all');
+                }}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-900 dark:hover:bg-slate-850 border border-slate-200 dark:border-slate-800 text-xs font-bold text-slate-700 dark:text-slate-300 transition-all cursor-pointer self-start md:self-auto"
+              >
+                <span>Switch to {activeCategoryTab === 'bike' ? '🚗 Electric Cars' : '🏍️ Electric Bikes'}</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
             </div>
 
             {/* CONTROLS: SEARCH, BRAND FILTER & SORT */}
@@ -278,7 +285,7 @@ export default function App() {
                         : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300'
                     }`}
                   >
-                    <span>🎓 Student Eligible Only</span>
+                    <span>🎓 Student Plan Eligible</span>
                   </button>
 
                   <div className="flex items-center gap-1.5">
@@ -290,7 +297,7 @@ export default function App() {
                       onChange={(e) => setSortBy(e.target.value)}
                       className="px-3 py-2 text-xs font-semibold rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 outline-none focus:ring-1 focus:ring-cyan-500"
                     >
-                      <option value="default">Featured Fleet</option>
+                      <option value="default">Featured Lineup</option>
                       <option value="price-asc">Price: Low to High</option>
                       <option value="price-desc">Price: High to Low</option>
                       <option value="range-desc">Longest Driving Range</option>
@@ -329,7 +336,7 @@ export default function App() {
               <div className="text-center py-16 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-8">
                 <Compass className="w-14 h-14 mx-auto mb-3 text-slate-300 dark:text-slate-700" />
                 <h3 className="text-base font-bold text-slate-800 dark:text-slate-200">
-                  No Matching EV Models Found
+                  No Matching {activeCategoryTab === 'bike' ? 'Bikes' : 'Cars'} Found
                 </h3>
                 <p className="text-slate-400 text-xs mt-1 max-w-sm mx-auto">
                   Try clearing your search query or selecting "All Brands" to view our complete lineup.
@@ -338,7 +345,7 @@ export default function App() {
                   onClick={() => { setSearchQuery(''); setSelectedBrand('all'); setStudentOnlyFilter(false); }}
                   className="mt-4 px-4 py-2 bg-cyan-500 text-slate-950 font-bold text-xs rounded-xl shadow cursor-pointer"
                 >
-                  Reset Showroom Filters
+                  Reset Fleet Filters
                 </button>
               </div>
             ) : (
@@ -353,14 +360,13 @@ export default function App() {
                       setSelectedVehicle(v);
                       setInitialVehicleModalTab(tab || 'details');
                     }}
-                    onOpenFit={(v) => setFitVehicle(v)}
                   />
                 ))}
               </div>
             )}
           </section>
 
-          {/* 5. EV STUDENT PLAN SECTION */}
+          {/* 6. EV STUDENT MONTHLY PLAN SECTION */}
           <StudentPlanSection
             onOpenCalculator={(type, price) => {
               setCalculatorStudentType(type);
@@ -373,13 +379,13 @@ export default function App() {
             }}
           />
 
-          {/* 6. WHY CHOOSE US (8 PILLARS) */}
+          {/* 7. WHY CHOOSE US (AUTOMOTIVE ASSURANCE) */}
           <WhyChooseUs />
 
-          {/* 7. EV BENEFITS (PETROL VS EV COMPARISON) */}
+          {/* 8. EV BENEFITS (PETROL VS EV SAVINGS CALCULATOR) */}
           <EVBenefits />
 
-          {/* 8. SHOWROOM OFFERS */}
+          {/* 9. SHOWROOM OFFERS */}
           <OffersSection
             onClaimOffer={(offerTitle) => {
               showToast(`Offer inquiry for "${offerTitle}" initiated with showroom desk`, 'success');
@@ -390,7 +396,7 @@ export default function App() {
             }}
           />
 
-          {/* 9. REVIEWS & FAQ */}
+          {/* 10. REVIEWS & FAQ */}
           <ReviewsAndFAQ
             onContactClick={() => handleNavigate('contact')}
           />
@@ -421,7 +427,6 @@ export default function App() {
                   setSelectedVehicle(v);
                   setInitialVehicleModalTab(tab || 'details');
                 }}
-                onOpenFit={(v) => setFitVehicle(v)}
               />
             ))}
           </div>
@@ -452,7 +457,6 @@ export default function App() {
                   setSelectedVehicle(v);
                   setInitialVehicleModalTab(tab || 'details');
                 }}
-                onOpenFit={(v) => setFitVehicle(v)}
               />
             ))}
           </div>
@@ -506,7 +510,7 @@ export default function App() {
               Connect With EVISTA Specialists
             </h1>
             <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">
-              Schedule an executive showroom visit, request fleet bulk booking, or inspect vehicles in person.
+              Schedule a doorstep test ride, request fleet bulk booking, or inspect vehicles in person.
             </p>
           </div>
 
@@ -534,9 +538,9 @@ export default function App() {
               <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">Inquiry Purpose</label>
               <select className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs outline-none">
                 <option>Booking a Doorstep Test Ride</option>
-                <option>Student EV Plan & Parental Verification</option>
+                <option>Student EV Monthly Plan & Parental Consent</option>
                 <option>Exchange Evaluation (Petrol to EV)</option>
-                <option>Bulk College / Corporate Fleet Inquiry</option>
+                <option>Corporate / College Fleet Inquiries</option>
               </select>
             </div>
 
@@ -551,7 +555,7 @@ export default function App() {
 
             <button
               onClick={() => showToast('Thank you! Our showroom representative will call you shortly.', 'success')}
-              className="w-full py-3.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-extrabold text-xs shadow-lg transition-all cursor-pointer"
+              className="w-full py-3.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-black text-xs shadow-lg transition-all cursor-pointer"
             >
               Send Showroom Inquiry
             </button>
@@ -588,7 +592,7 @@ export default function App() {
         />
       )}
 
-      {/* Detailed Vehicle Modal (Overview, Running Cost vs Petrol, Specs, 3D/360, Booking) */}
+      {/* Detailed Vehicle Modal (Overview, Specifications, Advantages, Suitability, Booking) */}
       {selectedVehicle && (
         <VehicleModal
           vehicle={selectedVehicle}
@@ -596,19 +600,10 @@ export default function App() {
           isCompared={comparedVehicleIds.includes(selectedVehicle.id)}
           onToggleCompare={toggleCompare}
           onClose={() => setSelectedVehicle(null)}
-          onOpenFit={(v) => setFitVehicle(v)}
           onOpenStudentPlan={() => {
             setSelectedVehicle(null);
             handleNavigate('student-plan');
           }}
-        />
-      )}
-
-      {/* Rider Ergonomics & Fit Studio Modal (Preserved) */}
-      {fitVehicle && (
-        <RiderFitModal
-          vehicle={fitVehicle}
-          onClose={() => setFitVehicle(null)}
         />
       )}
 
