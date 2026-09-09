@@ -1,8 +1,5 @@
 import { useState, useEffect } from 'react';
-import {
-  Search, ArrowUpDown, Compass, ArrowRight
-} from 'lucide-react';
-import { bikesData, carsData, bikeBrands, carBrands } from './vehiclesData';
+import { bikesData, carsData } from './vehiclesData';
 
 // Core Showcase Components
 import Navbar from './components/Navbar';
@@ -55,13 +52,9 @@ export default function App() {
   // Navigation / Page View: 'home' | 'bikes' | 'cars' | 'student-plan' | 'offers' | 'about' | 'contact'
   const [activePage, setActivePage] = useState('home');
 
-  // Filter & Search states (User chooses vehicle type FIRST: 'bike' | 'car')
+  // Filter state (User chooses vehicle type via toggle: 'bike' | 'car', defaults to 'bike')
   const [activeCategoryTab, setActiveCategoryTab] = useState('bike'); // 'bike' | 'car'
-  const [selectedBrand, setSelectedBrand] = useState('all');
   const [selectedLifestyle, setSelectedLifestyle] = useState('daily');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [sortBy, setSortBy] = useState('default'); // 'default', 'price-asc', 'price-desc', 'range-desc', 'speed-desc', 'rating-desc'
-  const [studentOnlyFilter, setStudentOnlyFilter] = useState(false);
 
   // Modals & Drawers state
   const [selectedVehicle, setSelectedVehicle] = useState(null);
@@ -115,10 +108,8 @@ export default function App() {
     setActivePage(page);
     if (page === 'bikes') {
       setActiveCategoryTab('bike');
-      setSelectedBrand('all');
     } else if (page === 'cars') {
       setActiveCategoryTab('car');
-      setSelectedBrand('all');
     }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -134,30 +125,6 @@ export default function App() {
       if (el) el.scrollIntoView({ behavior: 'smooth' });
     }, 100);
   };
-
-  // Active dataset strictly segregated by chosen vehicle type
-  const activeDataset = activeCategoryTab === 'bike' ? bikesData : carsData;
-  const activeBrands = activeCategoryTab === 'bike' ? bikeBrands : carBrands;
-
-  // Filter & Sort Logic
-  const filteredVehicles = activeDataset.filter((vehicle) => {
-    const matchesBrand = selectedBrand === 'all' || vehicle.brand === selectedBrand;
-    const matchesSearch =
-      vehicle.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      vehicle.brandName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      vehicle.type.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesStudent = !studentOnlyFilter || Boolean(vehicle.studentMonthlyPlan || vehicle.school || vehicle.college);
-    return matchesBrand && matchesSearch && matchesStudent;
-  });
-
-  const sortedVehicles = [...filteredVehicles].sort((a, b) => {
-    if (sortBy === 'price-asc') return a.price - b.price;
-    if (sortBy === 'price-desc') return b.price - a.price;
-    if (sortBy === 'range-desc') return b.range - a.range;
-    if (sortBy === 'speed-desc') return b.topSpeed - a.topSpeed;
-    if (sortBy === 'rating-desc') return b.rating - a.rating;
-    return 0; // default order
-  });
 
   // Compared vehicles objects
   const allVehicles = [...bikesData, ...carsData];
@@ -187,25 +154,25 @@ export default function App() {
           <HeroSection
             onExploreBikes={() => {
               setActiveCategoryTab('bike');
-              setSelectedBrand('all');
+              setSelectedLifestyle('daily');
               const el = document.getElementById('vehicle-type-selection');
               if (el) el.scrollIntoView({ behavior: 'smooth' });
             }}
             onExploreCars={() => {
               setActiveCategoryTab('car');
-              setSelectedBrand('all');
+              setSelectedLifestyle('daily');
               const el = document.getElementById('vehicle-type-selection');
               if (el) el.scrollIntoView({ behavior: 'smooth' });
             }}
             onFindPerfectEV={() => setIsRecommendationOpen(true)}
           />
 
-          {/* 3. VEHICLE TYPE SELECTION ("WHAT ARE YOU LOOKING FOR?") */}
+          {/* 3. VEHICLE TYPE SELECTION ("WHAT ARE YOU LOOKING FOR?") - COMPACT AUTOMOTIVE TOGGLE */}
           <VehicleTypeSelector
             selectedType={activeCategoryTab}
             onSelectType={(type) => {
               setActiveCategoryTab(type);
-              setSelectedBrand('all');
+              setSelectedLifestyle('daily');
             }}
             bikesCount={bikesData.length}
             carsCount={carsData.length}
@@ -223,148 +190,6 @@ export default function App() {
             onToggleCompare={toggleCompare}
             comparedVehicleIds={comparedVehicleIds}
           />
-
-          {/* 5. SHOWROOM FLEET CATALOG (STRICTLY SEGREGATED BY SELECTED TYPE) */}
-          <section id="catalog-showroom" className="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full text-left">
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
-              <div>
-                <span className="text-xs font-bold uppercase tracking-wider text-cyan-600 dark:text-cyan-400">
-                  {activeCategoryTab === 'bike' ? 'Two-Wheeler Showroom Floor' : 'Automobile Showroom Floor'}
-                </span>
-                <h2 className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white mt-1">
-                  {activeCategoryTab === 'bike' ? 'Electric Bike Lineup' : 'Electric Car Lineup'}
-                </h2>
-                <p className="text-slate-500 dark:text-slate-400 text-xs sm:text-sm mt-1">
-                  {activeCategoryTab === 'bike'
-                    ? `Showing ${bikesData.length} smart electric scooters, commuters, and performance superbikes.`
-                    : `Showing ${carsData.length} premium electric sedans, urban hatchbacks, and long-range SUVs.`
-                  }
-                </p>
-              </div>
-
-              {/* Quick Switch Segment Link */}
-              <button
-                type="button"
-                onClick={() => {
-                  const newType = activeCategoryTab === 'bike' ? 'car' : 'bike';
-                  setActiveCategoryTab(newType);
-                  setSelectedBrand('all');
-                }}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-900 dark:hover:bg-slate-850 border border-slate-200 dark:border-slate-800 text-xs font-bold text-slate-700 dark:text-slate-300 transition-all cursor-pointer self-start md:self-auto"
-              >
-                <span>Switch to {activeCategoryTab === 'bike' ? '🚗 Electric Cars' : '🏍️ Electric Bikes'}</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </button>
-            </div>
-
-            {/* CONTROLS: SEARCH, BRAND FILTER & SORT */}
-            <div className="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm mb-8 space-y-4">
-              <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
-                
-                {/* Search input */}
-                <div className="relative w-full md:max-w-md">
-                  <span className="absolute left-3.5 top-3.5 text-slate-400">
-                    <Search className="w-4.5 h-4.5" />
-                  </span>
-                  <input
-                    type="text"
-                    placeholder={`Search ${activeCategoryTab === 'bike' ? 'bikes' : 'cars'} by name, brand, or features...`}
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 text-slate-900 dark:text-slate-100 text-xs sm:text-sm outline-none focus:ring-2 focus:ring-cyan-500/30"
-                  />
-                </div>
-
-                {/* Right controls: Student Filter toggle & Sort */}
-                <div className="flex flex-wrap items-center gap-3 w-full md:w-auto justify-end">
-                  <button
-                    onClick={() => setStudentOnlyFilter(!studentOnlyFilter)}
-                    className={`px-3 py-2 rounded-xl border text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
-                      studentOnlyFilter
-                        ? 'bg-emerald-500 border-emerald-500 text-slate-950 shadow-sm'
-                        : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300'
-                    }`}
-                  >
-                    <span>🎓 Student Plan Eligible</span>
-                  </button>
-
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
-                      <ArrowUpDown className="w-3.5 h-3.5" /> Sort:
-                    </span>
-                    <select
-                      value={sortBy}
-                      onChange={(e) => setSortBy(e.target.value)}
-                      className="px-3 py-2 text-xs font-semibold rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 outline-none focus:ring-1 focus:ring-cyan-500"
-                    >
-                      <option value="default">Featured Lineup</option>
-                      <option value="price-asc">Price: Low to High</option>
-                      <option value="price-desc">Price: High to Low</option>
-                      <option value="range-desc">Longest Driving Range</option>
-                      <option value="speed-desc">Top Speed (Fastest)</option>
-                      <option value="rating-desc">Highest Rated</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-
-              {/* Horizontal Brand Strip */}
-              <div className="border-t border-slate-100 dark:border-slate-800/80 pt-3">
-                <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest block mb-2">
-                  Filter by Brand:
-                </span>
-                <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none snap-x">
-                  {activeBrands.map((brand) => (
-                    <button
-                      key={brand.id}
-                      onClick={() => setSelectedBrand(brand.id)}
-                      className={`px-3.5 py-1.5 rounded-xl text-xs font-bold shrink-0 transition-all border cursor-pointer snap-start ${
-                        selectedBrand === brand.id
-                          ? 'bg-cyan-500 text-slate-950 border-cyan-500 shadow-md font-black'
-                          : 'bg-white dark:bg-slate-800/60 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-800 hover:border-slate-300'
-                      }`}
-                    >
-                      {brand.name}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* VEHICLE GRID */}
-            {sortedVehicles.length === 0 ? (
-              <div className="text-center py-16 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-8">
-                <Compass className="w-14 h-14 mx-auto mb-3 text-slate-300 dark:text-slate-700" />
-                <h3 className="text-base font-bold text-slate-800 dark:text-slate-200">
-                  No Matching {activeCategoryTab === 'bike' ? 'Bikes' : 'Cars'} Found
-                </h3>
-                <p className="text-slate-400 text-xs mt-1 max-w-sm mx-auto">
-                  Try clearing your search query or selecting "All Brands" to view our complete lineup.
-                </p>
-                <button
-                  onClick={() => { setSearchQuery(''); setSelectedBrand('all'); setStudentOnlyFilter(false); }}
-                  className="mt-4 px-4 py-2 bg-cyan-500 text-slate-950 font-bold text-xs rounded-xl shadow cursor-pointer"
-                >
-                  Reset Fleet Filters
-                </button>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in duration-300">
-                {sortedVehicles.map((vehicle) => (
-                  <VehicleCard
-                    key={vehicle.id}
-                    vehicle={vehicle}
-                    isCompared={comparedVehicleIds.includes(vehicle.id)}
-                    onToggleCompare={toggleCompare}
-                    onViewVehicle={(v, tab) => {
-                      setSelectedVehicle(v);
-                      setInitialVehicleModalTab(tab || 'details');
-                    }}
-                  />
-                ))}
-              </div>
-            )}
-          </section>
 
           {/* 6. EV STUDENT MONTHLY PLAN SECTION */}
           <StudentPlanSection
