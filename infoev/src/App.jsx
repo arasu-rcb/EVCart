@@ -27,7 +27,6 @@ export default function App() {
   const [selectedVehicle, setSelectedVehicle] = useState(null);
   const [comparedVehicleIds, setComparedVehicleIds] = useState([]);
   const [sortBy, setSortBy] = useState('default'); // default, price-asc, price-desc, speed-desc, range-desc
-  const [colorSelections, setColorSelections] = useState({}); // { [vehicleId]: selectedColorIndex }
 
   // Sync dark mode class on <html>
   useEffect(() => {
@@ -40,14 +39,6 @@ export default function App() {
       localStorage.setItem('theme', 'light');
     }
   }, [isDark]);
-
-  // Handle color change on card
-  const handleColorChange = (vehicleId, colorIndex) => {
-    setColorSelections(prev => ({
-      ...prev,
-      [vehicleId]: colorIndex
-    }));
-  };
 
   // Toggle vehicle in comparison drawer
   const toggleCompare = (vehicleId) => {
@@ -109,7 +100,7 @@ export default function App() {
               ⚡
             </span>
             <span className="font-extrabold text-xl tracking-tight bg-gradient-to-r from-slate-900 to-indigo-700 dark:from-white dark:to-indigo-400 bg-clip-text text-transparent">
-              VOLT.EV
+              EVISTA
             </span>
           </div>
 
@@ -216,8 +207,8 @@ export default function App() {
             <button
               onClick={() => { setActiveCategory('bike'); setSelectedBrand('all'); }}
               className={`flex items-center gap-2 px-6 py-2.5 rounded-xl font-extrabold text-sm transition-all duration-300 cursor-pointer ${activeCategory === 'bike'
-                  ? 'bg-white dark:bg-indigo-600 text-slate-900 dark:text-white shadow-md scale-102'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
+                ? 'bg-white dark:bg-indigo-600 text-slate-900 dark:text-white shadow-md scale-102'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
                 }`}
             >
               <Bike className="w-4.5 h-4.5" />
@@ -226,8 +217,8 @@ export default function App() {
             <button
               onClick={() => { setActiveCategory('car'); setSelectedBrand('all'); }}
               className={`flex items-center gap-2 px-6 py-2.5 rounded-xl font-extrabold text-sm transition-all duration-300 cursor-pointer ${activeCategory === 'car'
-                  ? 'bg-white dark:bg-indigo-600 text-slate-900 dark:text-white shadow-md scale-102'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
+                ? 'bg-white dark:bg-indigo-600 text-slate-900 dark:text-white shadow-md scale-102'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
                 }`}
             >
               <Car className="w-4.5 h-4.5" />
@@ -284,8 +275,8 @@ export default function App() {
                   key={brand.id}
                   onClick={() => setSelectedBrand(brand.id)}
                   className={`px-4 py-2 rounded-xl text-xs font-bold shrink-0 transition-all border cursor-pointer snap-start ${selectedBrand === brand.id
-                      ? 'bg-slate-900 text-white border-slate-900 dark:bg-indigo-600 dark:text-white dark:border-indigo-600 shadow-md scale-102'
-                      : 'bg-white dark:bg-slate-800/40 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
+                    ? 'bg-slate-900 text-white border-slate-900 dark:bg-indigo-600 dark:text-white dark:border-indigo-600 shadow-md scale-102'
+                    : 'bg-white dark:bg-slate-800/40 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
                     }`}
                 >
                   {brand.name}
@@ -313,8 +304,6 @@ export default function App() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in duration-300">
             {sortedVehicles.map((vehicle) => {
-              const selectedColorIndex = colorSelections[vehicle.id] ?? 0;
-              const activeColor = vehicle.colors[selectedColorIndex] || vehicle.colors[0];
               const isCompared = comparedVehicleIds.includes(vehicle.id);
 
               return (
@@ -334,8 +323,8 @@ export default function App() {
                     <button
                       onClick={() => toggleCompare(vehicle.id)}
                       className={`absolute top-3 right-3 p-1 rounded-md border flex items-center justify-center cursor-pointer transition-all ${isCompared
-                          ? 'bg-indigo-600 border-indigo-600 text-white shadow-md'
-                          : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-transparent hover:border-slate-300 dark:hover:border-slate-600 hover:text-slate-200 dark:hover:text-slate-700'
+                        ? 'bg-indigo-600 border-indigo-600 text-white shadow-md'
+                        : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-transparent hover:border-slate-300 dark:hover:border-slate-600 hover:text-slate-200 dark:hover:text-slate-700'
                         }`}
                       title={isCompared ? "Remove from comparison" : "Compare this model"}
                     >
@@ -343,21 +332,15 @@ export default function App() {
                     </button>
 
                     <div className="relative flex justify-center items-center w-full h-full">
-                      {/* Interactive Background Glow */}
+                      {/* Ambient Background Glow */}
                       <div
-                        className="absolute w-28 h-28 rounded-full blur-[45px] opacity-15 dark:opacity-20 transition-colors duration-500"
-                        style={{ backgroundColor: activeColor.hex }}
+                        className="absolute w-28 h-28 rounded-full blur-[45px] opacity-15 dark:opacity-20 bg-indigo-500"
                       />
                       <div className="relative flex items-center justify-center">
                         <img
                           src={vehicle.image}
                           alt={vehicle.name}
-                          className={`relative w-44 md:w-48 h-28 md:h-32 object-contain transform group-hover:scale-105 transition-transform duration-300`}
-                        />
-                        {/* Dynamic Color Tint Overlay */}
-                        <div 
-                          className="absolute inset-0 pointer-events-none mix-blend-color opacity-35 transition-colors duration-500 rounded-xl"
-                          style={{ backgroundColor: activeColor.hex }}
+                          className="relative w-44 md:w-48 h-28 md:h-32 object-contain transform group-hover:scale-105 transition-transform duration-300"
                         />
                       </div>
                     </div>
@@ -385,27 +368,6 @@ export default function App() {
                         <div>
                           <span className="text-[10px] text-slate-400 block font-medium">Top Speed</span>
                           <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">{vehicle.topSpeed} km/h</span>
-                        </div>
-                      </div>
-
-                      {/* Color Options selectors */}
-                      <div className="mt-4 flex items-center justify-between">
-                        <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
-                          Colors
-                        </span>
-                        <div className="flex gap-2">
-                          {vehicle.colors.map((color, colorIdx) => (
-                            <button
-                              key={color.name}
-                              onClick={() => handleColorChange(vehicle.id, colorIdx)}
-                              style={{ backgroundColor: color.hex }}
-                              className={`w-3.5 h-3.5 rounded-full cursor-pointer hover:scale-115 transition-all shadow-sm ${selectedColorIndex === colorIdx
-                                  ? 'ring-1.5 ring-slate-800 dark:ring-white scale-110'
-                                  : 'opacity-70'
-                                }`}
-                              title={color.name}
-                            />
-                          ))}
                         </div>
                       </div>
                     </div>
@@ -493,7 +455,7 @@ export default function App() {
                 <span className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center font-black text-lg shadow-md">
                   ⚡
                 </span>
-                <span className="font-bold text-lg tracking-tight">VOLT.EV Showroom</span>
+                <span className="font-bold text-lg tracking-tight">EVISTA Showroom</span>
               </div>
               <p className="text-slate-500 text-xs leading-relaxed max-w-sm">
                 Curating the finest electric mobility solutions in town. From high-end urban naked commuters and scooters to premium off-road SUV cars.
@@ -510,11 +472,11 @@ export default function App() {
                 </li>
                 <li className="flex items-center gap-2">
                   <Phone className="w-3.5 h-3.5 text-slate-500" />
-                  <span>+1 (800) 555-VOLT</span>
+                  <span>+1 (800) 555-EVISTA</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <Mail className="w-3.5 h-3.5 text-slate-500" />
-                  <span>info@volt-ev-showroom.com</span>
+                  <span>info@evista-showroom.com</span>
                 </li>
               </ul>
             </div>
@@ -532,7 +494,7 @@ export default function App() {
           {/* Bottom Copyright Row */}
           <div className="pt-8 mt-2 text-center md:flex md:items-center md:justify-between text-xs text-slate-500">
             <div>
-              &copy; {new Date().getFullYear()} VOLT.EV. All rights reserved. Professional illustrations simulated.
+              &copy; {new Date().getFullYear()} EVISTA. All rights reserved. Professional illustrations simulated.
             </div>
           </div>
         </div>
@@ -542,7 +504,6 @@ export default function App() {
       {selectedVehicle && (
         <VehicleModal
           vehicle={selectedVehicle}
-          initialColorIndex={colorSelections[selectedVehicle.id] ?? 0}
           onClose={() => setSelectedVehicle(null)}
         />
       )}

@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
 import { X, Calendar, User, Mail, ShieldCheck, CheckCircle2, ChevronRight } from 'lucide-react';
 
-export default function VehicleModal({ vehicle, initialColorIndex = 0, onClose }) {
+export default function VehicleModal({ vehicle, onClose }) {
   if (!vehicle) return null;
-
-  const [selectedColor, setSelectedColor] = useState(vehicle.colors[initialColorIndex] || vehicle.colors[0]);
   const [bookingForm, setBookingForm] = useState({
     name: '',
     email: '',
@@ -59,10 +57,9 @@ export default function VehicleModal({ vehicle, initialColorIndex = 0, onClose }
             </h3>
             
             <div className="relative group w-full flex items-center justify-center">
-              {/* Colored glow effect */}
+              {/* Ambient Glow */}
               <div 
-                className="absolute inset-0 w-48 h-48 rounded-full blur-[60px] opacity-25 dark:opacity-30 transition-colors duration-500" 
-                style={{ backgroundColor: selectedColor.hex }}
+                className="absolute inset-0 w-48 h-48 rounded-full blur-[60px] opacity-20 dark:opacity-25 bg-indigo-500 transition-colors duration-500" 
               />
               <div className="relative flex items-center justify-center">
                 <img 
@@ -70,33 +67,6 @@ export default function VehicleModal({ vehicle, initialColorIndex = 0, onClose }
                   alt={vehicle.name} 
                   className="relative w-64 md:w-80 h-auto object-contain transform hover:scale-105 transition-transform duration-300"
                 />
-                {/* Dynamic Color Tint Overlay */}
-                <div 
-                  className="absolute inset-0 pointer-events-none mix-blend-color opacity-35 transition-colors duration-500 rounded-2xl"
-                  style={{ backgroundColor: selectedColor.hex }}
-                />
-              </div>
-            </div>
-
-            {/* Colors picker */}
-            <div className="mt-8 text-center">
-              <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-2">
-                Color Option: {selectedColor.name}
-              </span>
-              <div className="flex gap-3 justify-center">
-                {vehicle.colors.map((color) => (
-                  <button
-                    key={color.name}
-                    onClick={() => setSelectedColor(color)}
-                    style={{ backgroundColor: color.hex }}
-                    className={`w-6 h-6 rounded-full cursor-pointer transition-all duration-200 hover:scale-110 shadow-sm ${
-                      selectedColor.name === color.name 
-                        ? 'ring-2 ring-indigo-600 dark:ring-indigo-400 ring-offset-2 ring-offset-white dark:ring-offset-slate-900 scale-110' 
-                        : 'opacity-70 hover:opacity-100'
-                    }`}
-                    title={color.name}
-                  />
-                ))}
               </div>
             </div>
           </div>
