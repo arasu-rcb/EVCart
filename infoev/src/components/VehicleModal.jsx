@@ -1,291 +1,480 @@
-import React, { useState } from 'react';
-import { X, Calendar, User, Mail, ShieldCheck, CheckCircle2, ChevronRight, RotateCw, Image as ImageIcon } from 'lucide-react';
+import { useState } from 'react';
+import {
+  X, CheckCircle2, ChevronRight, RotateCw, Image as ImageIcon,
+  Zap, Star, User, GraduationCap, Scale
+} from 'lucide-react';
+import { formatINR } from '../vehiclesData';
 import Vehicle3DViewer from './Vehicle3DViewer';
+import Vehicle360Viewer from './Vehicle360Viewer';
 
-export default function VehicleModal({ vehicle, onClose, onOpenFit }) {
-  if (!vehicle) return null;
-  const [visualMode, setVisualMode] = useState('3d'); // '3d' | 'photo'
+export default function VehicleModal({
+  vehicle,
+  onClose,
+  onOpenFit,
+  onToggleCompare,
+  isCompared,
+  onOpenStudentPlan,
+  initialTab = 'details' // 'details' | 'specs' | 'enquire'
+}) {
+  const [activeVisual, setActiveVisual] = useState('3d'); // '3d' | '360' | 'photo'
+  const [activeTab, setActiveTab] = useState(initialTab); // 'details' | 'specs' | 'enquire'
+  
+  // Test drive / enquiry form
   const [bookingForm, setBookingForm] = useState({
     name: '',
     email: '',
+    phone: '',
+    city: '',
     date: '',
-    time: 'morning'
+    time: 'morning',
+    interestType: 'test-ride'
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
+  if (!vehicle) return null;
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setBookingForm((prev) => ({ ...prev, [name]: value }));
+    setBookingForm(prev => ({ ...prev, [name]: value }));
   };
 
   const handleBookingSubmit = (e) => {
     e.preventDefault();
-    if (!bookingForm.name || !bookingForm.email || !bookingForm.date) {
-      alert("Please fill in all details.");
+    if (!bookingForm.name || !bookingForm.phone) {
+      alert("Please fill in your name and phone number.");
       return;
     }
     setIsSubmitting(true);
-    // Simulate API call
     setTimeout(() => {
       setIsSubmitting(false);
       setIsSuccess(true);
-    }, 1500);
+    }, 1200);
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm overflow-y-auto">
-      {/* Modal Container */}
-      <div 
-        className="relative bg-white dark:bg-slate-900 w-full max-w-4xl rounded-2xl shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800 animate-in fade-in zoom-in-95 duration-200 flex flex-col md:flex-row max-h-[90vh] md:max-h-[85vh] overflow-y-auto"
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-950/85 backdrop-blur-md overflow-y-auto">
+      <div
+        className="relative bg-white dark:bg-slate-900 w-full max-w-5xl rounded-3xl shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800 animate-in fade-in zoom-in-95 duration-200 flex flex-col md:flex-row max-h-[92vh] text-left"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button */}
-        <button 
+        <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-2 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 z-10 transition-colors"
+          className="absolute top-4 right-4 p-2 rounded-full bg-slate-100/80 dark:bg-slate-800/80 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-300 z-30 transition-colors cursor-pointer"
         >
           <X className="w-5 h-5" />
         </button>
 
-        {/* Left Column: Visual Showcase (Transparent Background) */}
-        <div className="md:w-1/2 p-6 md:p-8 flex flex-col justify-between border-b md:border-b-0 md:border-r border-slate-200 dark:border-slate-800">
-          <div className="flex-1 flex flex-col justify-center items-center py-2">
-            <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 tracking-wider uppercase mb-1">
-              {vehicle.brandName} Showcase
-            </span>
-            <h3 className="text-2xl font-bold text-slate-900 dark:text-white text-center mb-4">
+        {/* LEFT COLUMN: VISUAL EXPERIENCE & STUDIO VIEWER */}
+        <div className="md:w-1/2 p-6 sm:p-8 flex flex-col justify-between border-b md:border-b-0 md:border-r border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/40 overflow-y-auto">
+          <div>
+            {/* Header Identity */}
+            <div className="flex items-center justify-between gap-2 mb-2">
+              <span className="px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-widest bg-cyan-500/20 text-cyan-600 dark:text-cyan-400 border border-cyan-500/30">
+                {vehicle.brandName} • {vehicle.type}
+              </span>
+              <div className="flex items-center gap-1 text-amber-500 text-xs font-bold">
+                <Star className="w-3.5 h-3.5 fill-current" />
+                <span>{vehicle.rating} ({vehicle.reviewCount || 120} reviews)</span>
+              </div>
+            </div>
+
+            <h3 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">
               {vehicle.name}
             </h3>
 
-            {/* Mode Switcher: 3D 360 vs Photo */}
-            <div className="flex items-center gap-1 p-1 bg-slate-100 dark:bg-slate-800/80 rounded-xl mb-4">
+            {/* Visual View Switcher (3D vs 360° vs Clean Photo) */}
+            <div className="flex items-center gap-1 p-1 bg-slate-200/70 dark:bg-slate-800/90 rounded-xl my-4 self-start">
               <button
-                onClick={() => setVisualMode('3d')}
-                className={`flex items-center gap-1.5 px-3 py-1 text-xs font-bold rounded-lg transition-all ${
-                  visualMode === '3d'
-                    ? 'bg-indigo-600 text-white shadow-sm'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                onClick={() => setActiveVisual('3d')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer ${
+                  activeVisual === '3d'
+                    ? 'bg-cyan-500 text-white shadow-md'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-white'
                 }`}
               >
                 <RotateCw className="w-3.5 h-3.5" />
-                3D 360° Model
+                3D Model
               </button>
+
               <button
-                onClick={() => setVisualMode('photo')}
-                className={`flex items-center gap-1.5 px-3 py-1 text-xs font-bold rounded-lg transition-all ${
-                  visualMode === 'photo'
-                    ? 'bg-indigo-600 text-white shadow-sm'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                onClick={() => setActiveVisual('360')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer ${
+                  activeVisual === '360'
+                    ? 'bg-cyan-500 text-white shadow-md'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-white'
+                }`}
+              >
+                <RotateCw className="w-3.5 h-3.5 text-amber-400" />
+                360° Turntable
+              </button>
+
+              <button
+                onClick={() => setActiveVisual('photo')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer ${
+                  activeVisual === 'photo'
+                    ? 'bg-cyan-500 text-white shadow-md'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-white'
                 }`}
               >
                 <ImageIcon className="w-3.5 h-3.5" />
-                Photo
+                Studio Photo
               </button>
             </div>
-            
-            {/* Visual Display Container */}
-            <div className="relative w-full flex items-center justify-center min-h-[260px]">
-              {visualMode === '3d' ? (
-                <Vehicle3DViewer
+
+            {/* Main Visual Display Stage */}
+            <div className="relative w-full flex items-center justify-center min-h-[260px] my-2">
+              {activeVisual === '3d' && (
+                <div className="w-full rounded-2xl overflow-hidden bg-slate-900/60 border border-slate-800">
+                  <Vehicle3DViewer
+                    vehicle={vehicle}
+                    height="270px"
+                    showControls={true}
+                  />
+                </div>
+              )}
+
+              {activeVisual === '360' && (
+                <Vehicle360Viewer
                   vehicle={vehicle}
-                  height="260px"
-                  showControls={true}
+                  height="270px"
                 />
-              ) : (
-                <div className="relative group w-full flex items-center justify-center">
-                  <img 
-                    src={vehicle.image} 
-                    alt={vehicle.name} 
-                    className="relative w-64 md:w-80 h-auto object-contain transform hover:scale-105 transition-transform duration-300"
+              )}
+
+              {activeVisual === 'photo' && (
+                <div className="w-full h-64 flex items-center justify-center p-4 bg-slate-950/40 rounded-2xl border border-slate-800">
+                  <img
+                    src={vehicle.image}
+                    alt={vehicle.name}
+                    className="max-h-52 max-w-[85%] object-contain drop-shadow-2xl"
                   />
                 </div>
               )}
             </div>
 
-            {/* Rider Ergonomics & Fit Check CTA */}
+            {/* Available Paint Finishes */}
+            {vehicle.colors && vehicle.colors.length > 0 && (
+              <div className="pt-3 flex items-center gap-2">
+                <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                  Colorways:
+                </span>
+                <div className="flex items-center gap-1.5">
+                  {vehicle.colors.map((c, i) => (
+                    <span
+                      key={i}
+                      className="w-4 h-4 rounded-full border border-slate-300 dark:border-slate-700 inline-block shadow-sm"
+                      style={{ backgroundColor: c.hex }}
+                      title={c.name}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Bottom Left Utility CTAs */}
+          <div className="pt-4 border-t border-slate-200 dark:border-slate-800 grid grid-cols-2 gap-2 mt-4">
+            <button
+              onClick={() => onToggleCompare(vehicle.id)}
+              className={`py-2 px-3 rounded-xl border text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                isCompared
+                  ? 'bg-indigo-600 border-indigo-500 text-white'
+                  : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-indigo-500'
+              }`}
+            >
+              <Scale className="w-3.5 h-3.5" />
+              <span>{isCompared ? 'In Compare' : 'Add to Compare'}</span>
+            </button>
+
             <button
               onClick={() => {
                 onClose();
                 if (onOpenFit) onOpenFit(vehicle);
               }}
-              className="w-full mt-4 py-2.5 px-4 bg-indigo-50 dark:bg-indigo-950/40 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 border border-indigo-200 dark:border-indigo-800 rounded-xl text-xs font-bold text-indigo-700 dark:text-indigo-300 flex items-center justify-center gap-2 transition-all cursor-pointer shadow-sm"
+              className="py-2 px-3 rounded-xl bg-indigo-50 dark:bg-indigo-950/40 hover:bg-indigo-100 text-indigo-700 dark:text-indigo-300 border border-indigo-300 dark:border-indigo-800 text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
             >
-              <User className="w-4 h-4" />
-              Check Rider Fit & Ergonomics with My Photo
+              <User className="w-3.5 h-3.5" />
+              <span>Rider Fit Check</span>
             </button>
-          </div>
-
-          {/* Key highlights */}
-          <div className="border-t border-slate-200 dark:border-slate-800 pt-6 mt-6">
-            <h4 className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-3">
-              Key Features
-            </h4>
-            <ul className="space-y-2 text-sm text-slate-600 dark:text-slate-300">
-              {vehicle.highlights.map((highlight, index) => (
-                <li key={index} className="flex items-start gap-2.5">
-                  <span className="w-5 h-5 rounded-full bg-emerald-50 dark:bg-emerald-950/50 flex items-center justify-center shrink-0 mt-0.5">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-                  </span>
-                  <span>{highlight}</span>
-                </li>
-              ))}
-            </ul>
           </div>
         </div>
 
-        {/* Right Column: Spec Sheets & Booking */}
-        <div className="md:w-1/2 p-6 md:p-8 flex flex-col justify-between">
+        {/* RIGHT COLUMN: SPECS, COST SAVINGS, SUITABILITY, AND BOOKING */}
+        <div className="md:w-1/2 p-6 sm:p-8 flex flex-col justify-between overflow-y-auto">
           <div>
-            {/* Tag/Badges */}
-            <div className="flex items-center gap-2 mb-3">
-              <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200/50 dark:border-slate-700/50">
-                {vehicle.type}
-              </span>
-              <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 capitalize">
-                {vehicle.category} Power
-              </span>
+            {/* Top Navigation Tabs */}
+            <div className="flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-3 mb-5">
+              <button
+                onClick={() => setActiveTab('details')}
+                className={`px-3 py-1.5 text-xs font-black rounded-lg transition-all cursor-pointer ${
+                  activeTab === 'details'
+                    ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-sm'
+                    : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
+                }`}
+              >
+                Overview & Cost
+              </button>
+              <button
+                onClick={() => setActiveTab('specs')}
+                className={`px-3 py-1.5 text-xs font-black rounded-lg transition-all cursor-pointer ${
+                  activeTab === 'specs'
+                    ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-sm'
+                    : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
+                }`}
+              >
+                Full Specs Matrix
+              </button>
+              <button
+                onClick={() => setActiveTab('enquire')}
+                className={`px-3 py-1.5 text-xs font-black rounded-lg transition-all cursor-pointer ${
+                  activeTab === 'enquire'
+                    ? 'bg-cyan-500 text-white shadow-sm'
+                    : 'text-cyan-600 dark:text-cyan-400 hover:text-cyan-300'
+                }`}
+              >
+                Book Test Ride
+              </button>
             </div>
 
-            <p className="text-slate-600 dark:text-slate-300 text-sm leading-relaxed mb-6">
-              {vehicle.description}
-            </p>
+            {/* TAB 1: OVERVIEW & RUNNING COST */}
+            {activeTab === 'details' && (
+              <div className="space-y-5 animate-in fade-in duration-150">
+                <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                  {vehicle.description}
+                </p>
 
-            {/* Specifications Matrix */}
-            <h4 className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-3">
-              Technical Specifications
-            </h4>
-            <div className="grid grid-cols-2 gap-4 mb-8">
-              <div className="bg-slate-50 dark:bg-slate-800/40 p-3 rounded-lg border border-slate-100 dark:border-slate-800/30">
-                <span className="text-xs text-slate-400 block">Est. Range</span>
-                <span className="text-sm font-bold text-slate-800 dark:text-slate-200">{vehicle.range} km</span>
+                {/* Price & Monthly/Daily Installment Banner */}
+                <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/80 grid grid-cols-2 gap-4">
+                  <div>
+                    <span className="text-[10px] font-bold uppercase text-slate-400 block">
+                      Showroom Price
+                    </span>
+                    <span className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
+                      {formatINR(vehicle.price)}
+                    </span>
+                    <span className="text-[10px] text-slate-400 block mt-0.5">Approx. ${vehicle.priceUSD} USD</span>
+                  </div>
+
+                  <div>
+                    <span className="text-[10px] font-bold uppercase text-slate-400 block">
+                      Estimated Monthly Installment
+                    </span>
+                    <span className="text-lg sm:text-xl font-bold text-cyan-600 dark:text-cyan-400">
+                      {vehicle.emi}
+                    </span>
+                    {vehicle.studentDailyPlan && (
+                      <span className="text-[10px] text-emerald-500 font-bold block mt-0.5">
+                        Student Plan: ₹{vehicle.studentDailyPlan.schoolDaily}/day
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* RUNNING COST COMPARISON (PETROL VS EV) */}
+                <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-950 dark:text-emerald-100">
+                  <div className="flex items-center gap-1.5 mb-2 font-black text-xs text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
+                    <Zap className="w-4 h-4" />
+                    <span>Running Cost & Savings vs Petrol</span>
+                  </div>
+                  <div className="grid grid-cols-3 gap-2 text-xs">
+                    <div>
+                      <span className="text-[10px] text-slate-500 dark:text-slate-400 block">EV Power:</span>
+                      <strong className="text-emerald-600 dark:text-emerald-300">
+                        {vehicle.petrolComparison?.runningCostEV || '₹0.25/km'}
+                      </strong>
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-slate-500 dark:text-slate-400 block">Petrol Equivalent:</span>
+                      <strong className="text-rose-500 dark:text-rose-400">
+                        {vehicle.petrolComparison?.runningCostPetrol || '₹2.40/km'}
+                      </strong>
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-slate-500 dark:text-slate-400 block">Annual Retention:</span>
+                      <strong className="text-emerald-500 dark:text-emerald-400 font-black">
+                        {vehicle.petrolComparison?.annualSavings || '₹32,500/yr'}
+                      </strong>
+                    </div>
+                  </div>
+                </div>
+
+                {/* CATEGORY SUITABILITY RATINGS */}
+                <div className="pt-2">
+                  <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 block mb-2">
+                    Lifestyle Suitability Grading:
+                  </span>
+                  <div className="grid grid-cols-2 gap-2 text-xs">
+                    <div className="flex justify-between items-center p-2 rounded-xl bg-slate-50 dark:bg-slate-850 border border-slate-200/60 dark:border-slate-800">
+                      <span className="text-slate-600 dark:text-slate-400 font-medium">Daily Commute:</span>
+                      <span className="font-bold text-amber-500">★★★★★</span>
+                    </div>
+                    <div className="flex justify-between items-center p-2 rounded-xl bg-slate-50 dark:bg-slate-850 border border-slate-200/60 dark:border-slate-800">
+                      <span className="text-slate-600 dark:text-slate-400 font-medium">Long Highway:</span>
+                      <span className="font-bold text-amber-500">{vehicle.range > 200 ? '★★★★★' : '★★★★☆'}</span>
+                    </div>
+                    <div className="flex justify-between items-center p-2 rounded-xl bg-slate-50 dark:bg-slate-850 border border-slate-200/60 dark:border-slate-800">
+                      <span className="text-slate-600 dark:text-slate-400 font-medium">Student Friendly:</span>
+                      <span className="font-bold text-amber-500">{vehicle.studentDailyPlan ? '★★★★★' : '★★★☆☆'}</span>
+                    </div>
+                    <div className="flex justify-between items-center p-2 rounded-xl bg-slate-50 dark:bg-slate-850 border border-slate-200/60 dark:border-slate-800">
+                      <span className="text-slate-600 dark:text-slate-400 font-medium">Family Utility:</span>
+                      <span className="font-bold text-amber-500">{vehicle.seating >= 2 ? '★★★★☆' : '★★★☆☆'}</span>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div className="bg-slate-50 dark:bg-slate-800/40 p-3 rounded-lg border border-slate-100 dark:border-slate-800/30">
-                <span className="text-xs text-slate-400 block">Top Speed</span>
-                <span className="text-sm font-bold text-slate-800 dark:text-slate-200">{vehicle.topSpeed} km/h</span>
+            )}
+
+            {/* TAB 2: FULL SPECS MATRIX */}
+            {activeTab === 'specs' && (
+              <div className="space-y-4 animate-in fade-in duration-150">
+                <div className="grid grid-cols-2 gap-2.5 text-xs">
+                  <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
+                    <span className="text-[10px] text-slate-400 block font-semibold">Single-Charge Range</span>
+                    <strong className="text-slate-900 dark:text-white text-sm">{vehicle.range} km</strong>
+                  </div>
+                  <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
+                    <span className="text-[10px] text-slate-400 block font-semibold">Top Speed</span>
+                    <strong className="text-slate-900 dark:text-white text-sm">{vehicle.topSpeed} km/h</strong>
+                  </div>
+                  <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
+                    <span className="text-[10px] text-slate-400 block font-semibold">Battery Chemistry</span>
+                    <strong className="text-slate-900 dark:text-white text-sm">{vehicle.batteryCapacity} kWh</strong>
+                  </div>
+                  <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
+                    <span className="text-[10px] text-slate-400 block font-semibold">Motor Power</span>
+                    <strong className="text-slate-900 dark:text-white text-sm">{vehicle.power}</strong>
+                  </div>
+                  <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
+                    <span className="text-[10px] text-slate-400 block font-semibold">Recharging Duration</span>
+                    <span className="text-slate-700 dark:text-slate-300 font-medium">{vehicle.chargingTime}</span>
+                  </div>
+                  <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
+                    <span className="text-[10px] text-slate-400 block font-semibold">Kerb Weight & Seating</span>
+                    <span className="text-slate-700 dark:text-slate-300 font-medium">{vehicle.weight} kg • {vehicle.seating} Seats</span>
+                  </div>
+                </div>
+
+                {/* Key Features Highlights */}
+                {vehicle.highlights && (
+                  <div className="pt-2">
+                    <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 block mb-2">
+                      Key Highlights:
+                    </span>
+                    <ul className="space-y-1.5 text-xs text-slate-600 dark:text-slate-300">
+                      {vehicle.highlights.map((h, i) => (
+                        <li key={i} className="flex items-start gap-2">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-cyan-500 shrink-0 mt-0.5" />
+                          <span>{h}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </div>
-              <div className="bg-slate-50 dark:bg-slate-800/40 p-3 rounded-lg border border-slate-100 dark:border-slate-800/30">
-                <span className="text-xs text-slate-400 block">Battery Capacity</span>
-                <span className="text-sm font-bold text-slate-800 dark:text-slate-200">{vehicle.batteryCapacity} kWh</span>
+            )}
+
+            {/* TAB 3: BOOK TEST RIDE / ENQUIRY FORM */}
+            {activeTab === 'enquire' && (
+              <div className="animate-in fade-in duration-150">
+                {isSuccess ? (
+                  <div className="p-6 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-center space-y-3">
+                    <CheckCircle2 className="w-12 h-12 text-emerald-500 mx-auto" />
+                    <h4 className="text-lg font-black text-slate-900 dark:text-white">
+                      Reservation Request Received!
+                    </h4>
+                    <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed max-w-sm mx-auto">
+                      Thank you, <strong>{bookingForm.name}</strong>. An authorized showroom specialist will contact you on <strong>{bookingForm.phone}</strong> to confirm your slot for the <strong>{vehicle.name}</strong>.
+                    </p>
+                  </div>
+                ) : (
+                  <form onSubmit={handleBookingSubmit} className="space-y-3">
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">
+                        Book a Doorstep / Showroom Test Ride
+                      </span>
+                      <span className="text-[10px] text-emerald-500 font-bold">100% Free</span>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2.5">
+                      <input
+                        type="text"
+                        name="name"
+                        value={bookingForm.name}
+                        onChange={handleInputChange}
+                        placeholder="Your Full Name *"
+                        required
+                        className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs text-slate-900 dark:text-slate-100 outline-none focus:ring-1 focus:ring-cyan-500"
+                      />
+                      <input
+                        type="tel"
+                        name="phone"
+                        value={bookingForm.phone}
+                        onChange={handleInputChange}
+                        placeholder="Phone Number *"
+                        required
+                        className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs text-slate-900 dark:text-slate-100 outline-none focus:ring-1 focus:ring-cyan-500"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2.5">
+                      <input
+                        type="email"
+                        name="email"
+                        value={bookingForm.email}
+                        onChange={handleInputChange}
+                        placeholder="Email Address"
+                        className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs text-slate-900 dark:text-slate-100 outline-none focus:ring-1 focus:ring-cyan-500"
+                      />
+                      <input
+                        type="date"
+                        name="date"
+                        value={bookingForm.date}
+                        onChange={handleInputChange}
+                        className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs text-slate-900 dark:text-slate-100 outline-none focus:ring-1 focus:ring-cyan-500"
+                      />
+                    </div>
+
+                    <button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="w-full mt-2 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-extrabold text-xs shadow-lg shadow-cyan-500/20 transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
+                    >
+                      {isSubmitting ? 'Submitting Reservation...' : 'Confirm Showroom Booking'}
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
+                  </form>
+                )}
               </div>
-              <div className="bg-slate-50 dark:bg-slate-800/40 p-3 rounded-lg border border-slate-100 dark:border-slate-800/30">
-                <span className="text-xs text-slate-400 block">Weight</span>
-                <span className="text-sm font-bold text-slate-800 dark:text-slate-200">{vehicle.weight} kg</span>
-              </div>
-              <div className="col-span-2 bg-indigo-50/55 dark:bg-indigo-950/20 p-3.5 rounded-lg border border-indigo-100/50 dark:border-indigo-900/30 flex justify-between items-center">
-                <span className="text-xs font-semibold text-indigo-700 dark:text-indigo-400">MSRP Base Price</span>
-                <span className="text-base font-extrabold text-slate-900 dark:text-slate-100">${vehicle.price.toLocaleString()}</span>
-              </div>
-            </div>
+            )}
           </div>
 
-          {/* Test Ride/Drive Booking Form */}
-          <div className="border-t border-slate-200 dark:border-slate-800 pt-6">
-            {isSuccess ? (
-              <div className="bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900/50 p-5 rounded-xl flex items-start gap-3">
-                <ShieldCheck className="w-6 h-6 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
-                <div>
-                  <h5 className="font-semibold text-slate-900 dark:text-slate-200 text-sm">
-                    Booking Confirmed!
-                  </h5>
-                  <p className="text-xs text-slate-600 dark:text-slate-400 mt-1 leading-relaxed">
-                    Thank you {bookingForm.name}. A test {vehicle.category === 'bike' ? 'ride' : 'drive'} reservation has been requested for <strong>{bookingForm.date}</strong> ({bookingForm.time}). We sent an email to <strong>{bookingForm.email}</strong> with details.
-                  </p>
-                </div>
-              </div>
+          {/* Bottom Action Strip */}
+          <div className="pt-4 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between gap-3 mt-6">
+            {vehicle.studentDailyPlan ? (
+              <button
+                onClick={() => {
+                  onClose();
+                  onOpenStudentPlan();
+                }}
+                className="text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1 cursor-pointer"
+              >
+                <GraduationCap className="w-4 h-4" />
+                <span>Check Student Plan (₹{vehicle.studentDailyPlan.schoolDaily}/d)</span>
+              </button>
             ) : (
-              <form onSubmit={handleBookingSubmit} className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200">
-                    Book a Test {vehicle.category === 'bike' ? 'Ride' : 'Drive'}
-                  </h4>
-                  <span className="text-[10px] text-slate-400 dark:text-slate-500 font-medium">
-                    No obligation, complimentary
-                  </span>
-                </div>
-                
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {/* Name */}
-                  <div className="relative flex items-center w-full">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
-                      <User className="w-4 h-4" />
-                    </span>
-                    <input
-                      type="text"
-                      name="name"
-                      value={bookingForm.name}
-                      onChange={handleInputChange}
-                      placeholder="Your Name"
-                      required
-                      className="w-full pl-10 pr-3 py-2.5 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/50 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-indigo-600 focus:border-indigo-600 dark:focus:ring-indigo-400 dark:focus:border-indigo-400 transition-shadow"
-                    />
-                  </div>
-
-                  {/* Email */}
-                  <div className="relative flex items-center w-full">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
-                      <Mail className="w-4 h-4" />
-                    </span>
-                    <input
-                      type="email"
-                      name="email"
-                      value={bookingForm.email}
-                      onChange={handleInputChange}
-                      placeholder="Email Address"
-                      required
-                      className="w-full pl-10 pr-3 py-2.5 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/50 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-indigo-600 focus:border-indigo-600 dark:focus:ring-indigo-400 dark:focus:border-indigo-400 transition-shadow"
-                    />
-                  </div>
-
-                  {/* Date */}
-                  <div className="relative flex items-center w-full col-span-1 sm:col-span-1">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
-                      <Calendar className="w-4 h-4" />
-                    </span>
-                    <input
-                      type="date"
-                      name="date"
-                      value={bookingForm.date}
-                      onChange={handleInputChange}
-                      required
-                      className="w-full pl-10 pr-3 py-2.5 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/50 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-indigo-600 focus:border-indigo-600 dark:focus:ring-indigo-400 dark:focus:border-indigo-400 transition-shadow"
-                    />
-                  </div>
-
-                  {/* Time slot selection */}
-                  <div className="col-span-1 sm:col-span-1">
-                    <select
-                      name="time"
-                      value={bookingForm.time}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2.5 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/50 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-indigo-600 focus:border-indigo-600 dark:focus:ring-indigo-400 dark:focus:border-indigo-400 transition-shadow"
-                    >
-                      <option value="morning">Morning (9 AM - 12 PM)</option>
-                      <option value="afternoon">Afternoon (12 PM - 4 PM)</option>
-                      <option value="evening">Evening (4 PM - 7 PM)</option>
-                    </select>
-                  </div>
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white font-semibold text-xs rounded-lg shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer"
-                >
-                  {isSubmitting ? (
-                    <>
-                      <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      Reserving Slot...
-                    </>
-                  ) : (
-                    <>
-                      Confirm Reservation
-                      <ChevronRight className="w-3.5 h-3.5" />
-                    </>
-                  )}
-                </button>
-              </form>
+              <span className="text-[11px] text-slate-400">
+                Official Warranty: 8 Years / 1,60,000 km
+              </span>
             )}
+
+            <button
+              onClick={() => setActiveTab('enquire')}
+              className="px-5 py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-black text-xs shadow-md transition-all cursor-pointer"
+            >
+              Enquire Now
+            </button>
           </div>
         </div>
       </div>

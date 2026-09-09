@@ -1,6 +1,6 @@
-import React, { useRef, useEffect, useState, useCallback } from 'react';
+import { useRef, useEffect, useState, useCallback } from 'react';
 import * as THREE from 'three';
-import { RotateCw, Pause, Play, Eye, Maximize2, Minimize2, Sparkles } from 'lucide-react';
+import { RotateCw, Pause, Play, Maximize2, Minimize2, Sparkles } from 'lucide-react';
 
 export default function Vehicle3DViewer({
   vehicle,

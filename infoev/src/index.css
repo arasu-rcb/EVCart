@@ -2,23 +2,88 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* Inter font or clean default typography */
+@theme {
+  --font-display: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
 @layer base {
+  html {
+    scroll-behavior: smooth;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+  }
+
   body {
-    @apply font-sans antialiased bg-gray-50 text-slate-800 transition-colors duration-300 dark:bg-slate-950 dark:text-slate-100;
+    @apply antialiased bg-slate-950 text-slate-100 transition-colors duration-300;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Outfit', sans-serif;
   }
 }
 
-/* Custom Scrollbar for premium feel */
+/* Glassmorphism styling */
+.glass-panel {
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-panel-light {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+/* EV Glow effects */
+.ev-glow-cyan {
+  box-shadow: 0 0 35px -5px rgba(6, 182, 212, 0.35);
+}
+
+.ev-glow-blue {
+  box-shadow: 0 0 35px -5px rgba(14, 165, 233, 0.35);
+}
+
+.ev-glow-emerald {
+  box-shadow: 0 0 35px -5px rgba(16, 185, 129, 0.35);
+}
+
+/* Studio Product Background */
+.studio-backdrop {
+  background: radial-gradient(circle at 50% 40%, rgba(30, 41, 59, 0.5) 0%, rgba(15, 23, 42, 0.95) 75%);
+}
+
+.studio-backdrop-light {
+  background: radial-gradient(circle at 50% 40%, rgba(241, 245, 249, 1) 0%, rgba(226, 232, 240, 0.8) 85%);
+}
+
+/* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-transparent;
+  background: rgba(15, 23, 42, 0.6);
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-slate-300 rounded-full dark:bg-slate-700 hover:bg-slate-400 dark:hover:bg-slate-600 transition-colors duration-150;
+  background: rgba(51, 65, 85, 0.8);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(14, 165, 233, 0.7);
+}
+
+/* Keyframe animations */
+@keyframes pulseSubtle {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.85; transform: scale(1.02); }
+}
+
+.animate-pulse-subtle {
+  animation: pulseSubtle 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
