@@ -30,6 +30,9 @@ export const bikesData = [
     topSpeed: 120, // km/h
     batteryCapacity: 4.0, // kWh
     weight: 116, // kg
+    seatHeight: 805, // mm
+    stance: 'Upright Commuter',
+    recommendedHeight: { min: 155, max: 192 },
     image: '/images/ola_s1_pro.png',
     colors: [
       { name: 'Mint Green', hex: '#a2e8dd' },
@@ -55,6 +58,9 @@ export const bikesData = [
     topSpeed: 126, // km/h
     batteryCapacity: 6.0, // kWh
     weight: 145, // kg
+    seatHeight: 800, // mm
+    stance: 'Sport Standard',
+    recommendedHeight: { min: 158, max: 195 },
     image: '/images/ola_roadster.png',
     colors: [
       { name: 'Matte White', hex: '#f3f4f6' },
@@ -82,6 +88,9 @@ export const bikesData = [
     topSpeed: 90, // km/h
     batteryCapacity: 3.7, // kWh
     weight: 111, // kg
+    seatHeight: 780, // mm
+    stance: 'Upright Sport',
+    recommendedHeight: { min: 152, max: 190 },
     image: '/images/ather_450x.png',
     colors: [
       { name: 'Space Grey / Mint', hex: '#4a5568' },
@@ -107,6 +116,9 @@ export const bikesData = [
     topSpeed: 80, // km/h
     batteryCapacity: 3.7, // kWh
     weight: 119, // kg
+    seatHeight: 780, // mm
+    stance: 'Comfort Upright',
+    recommendedHeight: { min: 150, max: 190 },
     image: '/images/ather_rizta.png',
     colors: [
       { name: 'Monsoon Blue', hex: '#4682b4' },
@@ -134,6 +146,9 @@ export const bikesData = [
     topSpeed: 155, // km/h
     batteryCapacity: 10.3, // kWh
     weight: 207, // kg
+    seatHeight: 800, // mm
+    stance: 'Aggressive Supersport',
+    recommendedHeight: { min: 160, max: 198 },
     image: '/images/ultraviolette_f77.png',
     colors: [
       { name: 'Crimson Red / Carbon', hex: '#c53030' },
@@ -159,6 +174,9 @@ export const bikesData = [
     topSpeed: 265, // km/h
     batteryCapacity: 12.0, // kWh
     weight: 178, // kg
+    seatHeight: 820, // mm
+    stance: 'Aggressive Supersport',
+    recommendedHeight: { min: 162, max: 200 },
     image: '/images/ultraviolette_f99.png',
     colors: [
       { name: 'Racing Carbon / Neon', hex: '#adff2f' }
@@ -185,6 +203,9 @@ export const bikesData = [
     topSpeed: 85, // km/h
     batteryCapacity: 3.24, // kWh
     weight: 108, // kg
+    seatHeight: 814, // mm
+    stance: 'Sport Standard',
+    recommendedHeight: { min: 156, max: 194 },
     image: '/images/revolt_rv400.png',
     colors: [
       { name: 'Rebel Red', hex: '#b22222' },
@@ -210,6 +231,9 @@ export const bikesData = [
     topSpeed: 80, // km/h
     batteryCapacity: 3.24, // kWh
     weight: 108, // kg
+    seatHeight: 814, // mm
+    stance: 'Sport Standard',
+    recommendedHeight: { min: 156, max: 194 },
     image: '/images/revolt_rv400.png',
     colors: [
       { name: 'Matte Pacific Blue', hex: '#1e3a8a' },
@@ -237,6 +261,9 @@ export const bikesData = [
     topSpeed: 78, // km/h
     batteryCapacity: 3.4, // kWh
     weight: 118, // kg
+    seatHeight: 770, // mm
+    stance: 'Comfort Upright',
+    recommendedHeight: { min: 150, max: 190 },
     image: '/images/ola_s1_pro.png',
     colors: [
       { name: 'Pearl White', hex: '#ffffff' },
@@ -262,6 +289,9 @@ export const bikesData = [
     topSpeed: 105, // km/h
     batteryCapacity: 4.4, // kWh
     weight: 132, // kg
+    seatHeight: 800, // mm
+    stance: 'Sport Standard',
+    recommendedHeight: { min: 156, max: 194 },
     image: '/images/ather_450x.png',
     colors: [
       { name: 'Signature Red / Black', hex: '#e53e3e' }
@@ -290,7 +320,10 @@ export const carsData = [
     topSpeed: 322, // km/h
     batteryCapacity: 100.0, // kWh
     weight: 2162, // kg
-    image: '/images/tesla_model_s.jpg',
+    seatHeight: 480, // mm
+    stance: 'Low-Slung Executive',
+    recommendedHeight: { min: 150, max: 205 },
+    image: '/images/tesla_model_s.png',
     colors: [
       { name: 'Ultra Red', hex: '#a61c24' },
       { name: 'Solid Black', hex: '#0f0f10' },
@@ -316,7 +349,10 @@ export const carsData = [
     topSpeed: 217, // km/h
     batteryCapacity: 75.0, // kWh
     weight: 1979, // kg
-    image: '/images/tesla_model_s.jpg',
+    seatHeight: 520, // mm
+    stance: 'Elevated Command',
+    recommendedHeight: { min: 150, max: 205 },
+    image: '/images/tesla_model_s.png',
     colors: [
       { name: 'Pearl White Multi-Coat', hex: '#f3f4f6' },
       { name: 'Deep Blue Metallic', hex: '#1e3a8a' }
@@ -343,7 +379,10 @@ export const carsData = [
     topSpeed: 260, // km/h
     batteryCapacity: 93.4, // kWh
     weight: 2295, // kg
-    image: '/images/porsche_taycan.jpg',
+    seatHeight: 460, // mm
+    stance: 'Sport Cockpit',
+    recommendedHeight: { min: 152, max: 202 },
+    image: '/images/porsche_taycan.png',
     colors: [
       { name: 'Frozen Blue Metallic', hex: '#4682b4' },
       { name: 'Carrara White Metallic', hex: '#f8fafc' },
@@ -371,7 +410,10 @@ export const carsData = [
     topSpeed: 180, // km/h
     batteryCapacity: 82.5, // kWh
     weight: 2055, // kg
-    image: '/images/byd_seal.jpg',
+    seatHeight: 490, // mm
+    stance: 'Modern Aerodynamic',
+    recommendedHeight: { min: 150, max: 202 },
+    image: '/images/byd_seal.png',
     colors: [
       { name: 'Cool Grey', hex: '#708090' },
       { name: 'Aurora White', hex: '#ffffff' },
@@ -399,7 +441,10 @@ export const carsData = [
     topSpeed: 201, // km/h
     batteryCapacity: 135.0, // kWh
     weight: 3137, // kg
-    image: '/images/rivian_r1s.jpg',
+    seatHeight: 620, // mm
+    stance: 'High-Clearance Adventure',
+    recommendedHeight: { min: 152, max: 208 },
+    image: '/images/rivian_r1s.png',
     colors: [
       { name: 'Forest Green', hex: '#2d5a27' },
       { name: 'LA Silver', hex: '#cbd5e1' },
@@ -427,7 +472,10 @@ export const carsData = [
     topSpeed: 185, // km/h
     batteryCapacity: 77.4, // kWh
     weight: 2020, // kg
-    image: '/images/hyundai_ioniq5.jpg',
+    seatHeight: 530, // mm
+    stance: 'Lounge Crossover',
+    recommendedHeight: { min: 150, max: 205 },
+    image: '/images/hyundai_ioniq5.png',
     colors: [
       { name: 'Matte Gold', hex: '#c5b358' },
       { name: 'Cyber Grey', hex: '#d1d5db' },

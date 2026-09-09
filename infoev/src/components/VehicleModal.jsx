@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { X, Calendar, User, Mail, ShieldCheck, CheckCircle2, ChevronRight } from 'lucide-react';
+import { X, Calendar, User, Mail, ShieldCheck, CheckCircle2, ChevronRight, RotateCw, Image as ImageIcon } from 'lucide-react';
+import Vehicle3DViewer from './Vehicle3DViewer';
 
-export default function VehicleModal({ vehicle, onClose }) {
+export default function VehicleModal({ vehicle, onClose, onOpenFit }) {
   if (!vehicle) return null;
+  const [visualMode, setVisualMode] = useState('3d'); // '3d' | 'photo'
   const [bookingForm, setBookingForm] = useState({
     name: '',
     email: '',
@@ -46,29 +48,72 @@ export default function VehicleModal({ vehicle, onClose }) {
           <X className="w-5 h-5" />
         </button>
 
-        {/* Left Column: Visual Showcase */}
-        <div className="md:w-1/2 p-6 md:p-8 bg-slate-50 dark:bg-slate-950/40 flex flex-col justify-between border-b md:border-b-0 md:border-r border-slate-200 dark:border-slate-800">
-          <div className="flex-1 flex flex-col justify-center items-center py-4">
+        {/* Left Column: Visual Showcase (Transparent Background) */}
+        <div className="md:w-1/2 p-6 md:p-8 flex flex-col justify-between border-b md:border-b-0 md:border-r border-slate-200 dark:border-slate-800">
+          <div className="flex-1 flex flex-col justify-center items-center py-2">
             <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 tracking-wider uppercase mb-1">
               {vehicle.brandName} Showcase
             </span>
-            <h3 className="text-2xl font-bold text-slate-900 dark:text-white text-center mb-6">
+            <h3 className="text-2xl font-bold text-slate-900 dark:text-white text-center mb-4">
               {vehicle.name}
             </h3>
-            
-            <div className="relative group w-full flex items-center justify-center">
-              {/* Ambient Glow */}
-              <div 
-                className="absolute inset-0 w-48 h-48 rounded-full blur-[60px] opacity-20 dark:opacity-25 bg-indigo-500 transition-colors duration-500" 
-              />
-              <div className="relative flex items-center justify-center">
-                <img 
-                  src={vehicle.image} 
-                  alt={vehicle.name} 
-                  className="relative w-64 md:w-80 h-auto object-contain transform hover:scale-105 transition-transform duration-300"
-                />
-              </div>
+
+            {/* Mode Switcher: 3D 360 vs Photo */}
+            <div className="flex items-center gap-1 p-1 bg-slate-100 dark:bg-slate-800/80 rounded-xl mb-4">
+              <button
+                onClick={() => setVisualMode('3d')}
+                className={`flex items-center gap-1.5 px-3 py-1 text-xs font-bold rounded-lg transition-all ${
+                  visualMode === '3d'
+                    ? 'bg-indigo-600 text-white shadow-sm'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                }`}
+              >
+                <RotateCw className="w-3.5 h-3.5" />
+                3D 360° Model
+              </button>
+              <button
+                onClick={() => setVisualMode('photo')}
+                className={`flex items-center gap-1.5 px-3 py-1 text-xs font-bold rounded-lg transition-all ${
+                  visualMode === 'photo'
+                    ? 'bg-indigo-600 text-white shadow-sm'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                }`}
+              >
+                <ImageIcon className="w-3.5 h-3.5" />
+                Photo
+              </button>
             </div>
+            
+            {/* Visual Display Container */}
+            <div className="relative w-full flex items-center justify-center min-h-[260px]">
+              {visualMode === '3d' ? (
+                <Vehicle3DViewer
+                  vehicle={vehicle}
+                  height="260px"
+                  showControls={true}
+                />
+              ) : (
+                <div className="relative group w-full flex items-center justify-center">
+                  <img 
+                    src={vehicle.image} 
+                    alt={vehicle.name} 
+                    className="relative w-64 md:w-80 h-auto object-contain transform hover:scale-105 transition-transform duration-300"
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Rider Ergonomics & Fit Check CTA */}
+            <button
+              onClick={() => {
+                onClose();
+                if (onOpenFit) onOpenFit(vehicle);
+              }}
+              className="w-full mt-4 py-2.5 px-4 bg-indigo-50 dark:bg-indigo-950/40 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 border border-indigo-200 dark:border-indigo-800 rounded-xl text-xs font-bold text-indigo-700 dark:text-indigo-300 flex items-center justify-center gap-2 transition-all cursor-pointer shadow-sm"
+            >
+              <User className="w-4 h-4" />
+              Check Rider Fit & Ergonomics with My Photo
+            </button>
           </div>
 
           {/* Key highlights */}
