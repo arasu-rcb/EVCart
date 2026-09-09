@@ -27,12 +27,12 @@ export default function ExploreByNeed({
     : (vehicleTypeTab === 'bike' ? matchingBikes : matchingCars);
 
   return (
-    <section id="explore-by-need" className="py-16 sm:py-20 bg-slate-900/50 dark:bg-slate-900/40 border-b border-slate-200 dark:border-slate-800 transition-colors">
+    <section id="explore-by-need" className="py-16 sm:py-20 bg-slate-100/70 dark:bg-slate-900/40 border-b border-slate-200 dark:border-slate-800 transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-12">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-bold uppercase tracking-wider mb-3">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-600 dark:text-cyan-400 text-xs font-bold uppercase tracking-wider mb-3">
             <Sparkles className="w-3.5 h-3.5" />
             <span>Lifestyle-Driven Engineering</span>
           </div>
@@ -57,8 +57,8 @@ export default function ExploreByNeed({
                 onClick={() => onSelectCategory(category.id)}
                 className={`p-4 rounded-2xl border text-left transition-all duration-300 flex flex-col justify-between cursor-pointer group relative overflow-hidden ${
                   isSelected
-                    ? 'bg-gradient-to-b from-slate-900 to-slate-950 border-cyan-500 text-white shadow-xl shadow-cyan-500/20 scale-102 ring-2 ring-cyan-500/40'
-                    : 'bg-white dark:bg-slate-900/80 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-cyan-500/50 hover:bg-slate-50 dark:hover:bg-slate-850 hover:-translate-y-1'
+                    ? 'bg-slate-900 dark:bg-slate-900 border-cyan-500 text-white shadow-xl shadow-cyan-500/20 scale-102 ring-2 ring-cyan-500/40'
+                    : 'bg-white dark:bg-slate-900/80 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-cyan-500/50 hover:bg-slate-50 dark:hover:bg-slate-800 hover:-translate-y-1'
                 }`}
               >
                 {isSelected && (
@@ -69,19 +69,27 @@ export default function ExploreByNeed({
                   <div className="text-2xl mb-2 group-hover:scale-110 transition-transform">
                     {category.emoji}
                   </div>
-                  <h3 className="font-extrabold text-sm tracking-tight text-slate-900 dark:text-white leading-snug">
+                  <h3 className={`font-extrabold text-sm tracking-tight leading-snug ${
+                    isSelected ? 'text-white' : 'text-slate-900 dark:text-white'
+                  }`}>
                     {category.name}
                   </h3>
-                  <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">
+                  <p className={`text-[11px] mt-1 line-clamp-2 ${
+                    isSelected ? 'text-slate-300' : 'text-slate-500 dark:text-slate-400'
+                  }`}>
                     {category.description}
                   </p>
                 </div>
 
-                <div className="mt-4 pt-2.5 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-[10px] font-bold text-slate-400">
-                  <span className="text-cyan-600 dark:text-cyan-400">
+                <div className={`mt-4 pt-2.5 border-t flex items-center justify-between text-[10px] font-bold ${
+                  isSelected ? 'border-slate-800 text-slate-300' : 'border-slate-100 dark:border-slate-800 text-slate-400'
+                }`}>
+                  <span className={isSelected ? 'text-cyan-400' : 'text-cyan-600 dark:text-cyan-400'}>
                     {countBikes}B + {countCars}C
                   </span>
-                  <span className={`px-1.5 py-0.5 rounded text-[9px] ${isSelected ? 'bg-cyan-500/20 text-cyan-300' : 'bg-slate-100 dark:bg-slate-800 text-slate-400'}`}>
+                  <span className={`px-1.5 py-0.5 rounded text-[9px] ${
+                    isSelected ? 'bg-cyan-500/20 text-cyan-300' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
+                  }`}>
                     {category.badge}
                   </span>
                 </div>

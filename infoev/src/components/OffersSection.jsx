@@ -89,7 +89,7 @@ export default function OffersSection({
   ];
 
   return (
-    <section id="offers" className="py-16 sm:py-24 bg-slate-900/70 dark:bg-slate-950 text-white relative overflow-hidden border-b border-slate-200 dark:border-slate-800 transition-colors">
+    <section id="offers" className="py-16 sm:py-24 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white relative overflow-hidden border-b border-slate-200 dark:border-slate-800 transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Header */}
