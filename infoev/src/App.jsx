@@ -24,6 +24,8 @@ import EVBenefits from './components/EVBenefits';
 import ReviewsAndFAQ from './components/ReviewsAndFAQ';
 import SearchModal from './components/SearchModal';
 import ToastNotification from './components/ToastNotification';
+import EmailConfirmationModal from './components/EmailConfirmationModal';
+import { sendTestDriveConfirmationEmail } from './services/emailService';
 import Footer from './components/Footer';
 
 export default function App() {
@@ -78,6 +80,55 @@ export default function App() {
   const showToast = (message, type = 'info') => {
     setToast({ message, type });
     setTimeout(() => setToast(null), 4000);
+  };
+
+  // Contact & Doorstep Ride Form State
+  const [contactForm, setContactForm] = useState({
+    name: '',
+    phone: '',
+    email: '',
+    purpose: 'Booking a Doorstep Test Ride',
+    message: ''
+  });
+  const [isSubmittingContact, setIsSubmittingContact] = useState(false);
+  const [contactBookingResult, setContactBookingResult] = useState(null);
+
+  const handleContactSubmit = async (e) => {
+    e.preventDefault();
+    if (!contactForm.name || !contactForm.phone || !contactForm.email) {
+      showToast('Please provide your name, phone number, and email address.', 'error');
+      return;
+    }
+
+    setIsSubmittingContact(true);
+    try {
+      const result = await sendTestDriveConfirmationEmail({
+        name: contactForm.name,
+        email: contactForm.email,
+        phone: contactForm.phone,
+        city: 'Local Area / Doorstep Service',
+        date: new Date(Date.now() + 86400000).toISOString().split('T')[0],
+        time: 'morning',
+        interestType: contactForm.purpose,
+        vehicleName: 'Doorstep EV Test Ride Experience',
+        brandName: 'EVista Multi-Brand'
+      });
+
+      setContactBookingResult(result);
+      showToast(`Confirmation email sent to ${contactForm.email}!`, 'success');
+      setContactForm({
+        name: '',
+        phone: '',
+        email: '',
+        purpose: 'Booking a Doorstep Test Ride',
+        message: ''
+      });
+    } catch (err) {
+      console.error('Contact inquiry dispatch failed:', err);
+      showToast('Unable to dispatch request. Please try again.', 'error');
+    } finally {
+      setIsSubmittingContact(false);
+    }
   };
 
   // Compare toggling
@@ -412,29 +463,56 @@ export default function App() {
             </p>
           </div>
 
-          <div className="p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl space-y-6">
+          <form onSubmit={handleContactSubmit} className="p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl space-y-5">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">Your Full Name</label>
+                <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">Your Full Name *</label>
                 <input
                   type="text"
+                  required
+                  value={contactForm.name}
+                  onChange={(e) => setContactForm(prev => ({ ...prev, name: e.target.value }))}
                   placeholder="e.g. Ramesh Patel"
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs outline-none"
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs text-slate-900 dark:text-slate-100 outline-none focus:ring-2 focus:ring-cyan-500"
                 />
               </div>
               <div>
-                <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">Phone Number</label>
+                <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">Phone Number *</label>
                 <input
                   type="tel"
+                  required
+                  value={contactForm.phone}
+                  onChange={(e) => setContactForm(prev => ({ ...prev, phone: e.target.value }))}
                   placeholder="+91 98765 43210"
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs outline-none"
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs text-slate-900 dark:text-slate-100 outline-none focus:ring-2 focus:ring-cyan-500"
                 />
               </div>
             </div>
 
             <div>
+              <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">
+                Email Address (For Instant Email Confirmation Pass) *
+              </label>
+              <input
+                type="email"
+                required
+                value={contactForm.email}
+                onChange={(e) => setContactForm(prev => ({ ...prev, email: e.target.value }))}
+                placeholder="ramesh.patel@example.com"
+                className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs text-slate-900 dark:text-slate-100 outline-none focus:ring-2 focus:ring-cyan-500"
+              />
+              <span className="text-[10px] text-cyan-600 dark:text-cyan-400 mt-1 block">
+                Official test drive reservation pass and confirmation details are dispatched directly to this email.
+              </span>
+            </div>
+
+            <div>
               <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">Inquiry Purpose</label>
-              <select className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs outline-none">
+              <select
+                value={contactForm.purpose}
+                onChange={(e) => setContactForm(prev => ({ ...prev, purpose: e.target.value }))}
+                className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs text-slate-900 dark:text-slate-100 outline-none focus:ring-2 focus:ring-cyan-500"
+              >
                 <option>Booking a Doorstep Test Ride</option>
                 <option>Student EV Monthly Plan & Parental Consent</option>
                 <option>Exchange Evaluation (Petrol to EV)</option>
@@ -446,18 +524,28 @@ export default function App() {
               <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">Message / Requirements</label>
               <textarea
                 rows={4}
+                value={contactForm.message}
+                onChange={(e) => setContactForm(prev => ({ ...prev, message: e.target.value }))}
                 placeholder="Tell us about the vehicle models or charging requirements you are interested in..."
-                className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs outline-none"
+                className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs text-slate-900 dark:text-slate-100 outline-none focus:ring-2 focus:ring-cyan-500"
               />
             </div>
 
             <button
-              onClick={() => showToast('Thank you! Our showroom representative will call you shortly.', 'success')}
-              className="w-full py-3.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-black text-xs shadow-lg transition-all cursor-pointer"
+              type="submit"
+              disabled={isSubmittingContact}
+              className="w-full py-3.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-black text-xs shadow-lg transition-all cursor-pointer flex items-center justify-center gap-2 disabled:opacity-60"
             >
-              Send Showroom Inquiry
+              {isSubmittingContact ? (
+                <>
+                  <div className="w-3.5 h-3.5 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
+                  <span>Dispatching Confirmation Email...</span>
+                </>
+              ) : (
+                <span>Submit Inquiry & Send Email Confirmation</span>
+              )}
             </button>
-          </div>
+          </form>
         </main>
       )}
 
@@ -559,6 +647,14 @@ export default function App() {
           if (el) el.scrollIntoView({ behavior: 'smooth' });
         }}
       />
+
+      {/* Contact Test Ride Email Confirmation Pass Modal */}
+      {contactBookingResult && (
+        <EmailConfirmationModal
+          bookingResult={contactBookingResult}
+          onClose={() => setContactBookingResult(null)}
+        />
+      )}
 
       {/* Toast Notification System */}
       <ToastNotification

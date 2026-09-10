@@ -1,9 +1,12 @@
 import { useState } from 'react';
 import {
   X, CheckCircle2, ChevronRight,
-  Zap, Star, GraduationCap, Scale, BatteryCharging, Gauge, Clock, Users, ArrowRight
+  Zap, Star, GraduationCap, Scale, BatteryCharging, Gauge, Clock, Users, ArrowRight,
+  Mail, Calendar, Ticket, ExternalLink, Sparkles
 } from 'lucide-react';
 import { formatINR } from '../vehiclesData';
+import { sendTestDriveConfirmationEmail, getEmailConfig } from '../services/emailService';
+import EmailConfirmationModal from './EmailConfirmationModal';
 
 export default function VehicleModal({
   vehicle,
@@ -21,12 +24,14 @@ export default function VehicleModal({
     email: '',
     phone: '',
     city: '',
-    date: '',
+    date: new Date(Date.now() + 86400000).toISOString().split('T')[0], // Default tomorrow
     time: 'morning',
     interestType: 'test-ride'
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [bookingResult, setBookingResult] = useState(null);
+  const [showEmailModal, setShowEmailModal] = useState(false);
 
   if (!vehicle) return null;
 
@@ -35,17 +40,38 @@ export default function VehicleModal({
     setBookingForm(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleBookingSubmit = (e) => {
+  const handleBookingSubmit = async (e) => {
     e.preventDefault();
-    if (!bookingForm.name || !bookingForm.phone) {
-      alert("Please fill in your name and phone number.");
+    if (!bookingForm.name || !bookingForm.phone || !bookingForm.email) {
+      alert("Please enter your name, phone number, and email address to receive your confirmation.");
       return;
     }
+
     setIsSubmitting(true);
-    setTimeout(() => {
-      setIsSubmitting(false);
+    try {
+      const result = await sendTestDriveConfirmationEmail({
+        name: bookingForm.name,
+        email: bookingForm.email,
+        phone: bookingForm.phone,
+        city: bookingForm.city,
+        date: bookingForm.date,
+        time: bookingForm.time,
+        interestType: bookingForm.interestType,
+        vehicleName: vehicle.name,
+        brandName: vehicle.brandName,
+        vehicleType: vehicle.type,
+        vehiclePrice: vehicle.price,
+        vehicleImage: vehicle.image
+      });
+
+      setBookingResult(result);
       setIsSuccess(true);
-    }, 1200);
+    } catch (err) {
+      console.error('Test drive booking failed:', err);
+      alert('Unable to process booking. Please check your connection and try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const isStudentEligible = Boolean(vehicle.studentMonthlyPlan || vehicle.school || vehicle.college);
@@ -311,14 +337,44 @@ export default function VehicleModal({
             {activeTab === 'enquire' && (
               <div className="animate-in fade-in duration-150">
                 {isSuccess ? (
-                  <div className="p-8 rounded-3xl bg-emerald-500/10 border border-emerald-500/30 text-center space-y-3 my-4">
-                    <CheckCircle2 className="w-12 h-12 text-emerald-500 mx-auto" />
-                    <h4 className="text-xl font-black text-slate-900 dark:text-white">
-                      Reservation Request Received!
-                    </h4>
+                  <div className="p-6 rounded-3xl bg-emerald-500/10 border border-emerald-500/30 text-center space-y-4 my-2">
+                    <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-500 flex items-center justify-center mx-auto">
+                      <CheckCircle2 className="w-8 h-8" />
+                    </div>
+
+                    <div>
+                      <span className="text-[10px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400 block mb-1">
+                        Booking Reference: {bookingResult?.bookingId || 'EV-TR-CONFIRMED'}
+                      </span>
+                      <h4 className="text-xl font-black text-slate-900 dark:text-white">
+                        Test Drive Confirmed!
+                      </h4>
+                    </div>
+
                     <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed max-w-sm mx-auto">
-                      Thank you, <strong>{bookingForm.name}</strong>. An authorized showroom specialist will contact you on <strong>{bookingForm.phone}</strong> to confirm your slot for the <strong>{vehicle.name}</strong>.
+                      Thank you, <strong>{bookingForm.name}</strong>. A confirmation email has been dispatched to{' '}
+                      <strong className="text-cyan-600 dark:text-cyan-400 underline">{bookingForm.email}</strong> with your showroom entry pass for the <strong>{vehicle.name}</strong>.
                     </p>
+
+                    <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-2.5">
+                      <button
+                        onClick={() => setShowEmailModal(true)}
+                        className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-black text-xs shadow-md shadow-emerald-500/20 transition-all cursor-pointer flex items-center justify-center gap-2"
+                      >
+                        <Ticket className="w-4 h-4" />
+                        <span>View Confirmation Email Pass</span>
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          setIsSuccess(false);
+                          setBookingForm(prev => ({ ...prev, name: '', phone: '', email: '' }));
+                        }}
+                        className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs transition-colors cursor-pointer"
+                      >
+                        Book Another Ride
+                      </button>
+                    </div>
                   </div>
                 ) : (
                   <form onSubmit={handleBookingSubmit} className="space-y-3.5 my-2">
@@ -326,57 +382,114 @@ export default function VehicleModal({
                       <span className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">
                         Doorstep / Showroom Test Ride
                       </span>
-                      <span className="text-[10px] text-emerald-500 font-bold bg-emerald-500/10 px-2 py-0.5 rounded-full">
-                        100% Free Experience
+                      <span className="text-[10px] text-emerald-500 font-bold bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/20 flex items-center gap-1">
+                        <Sparkles className="w-3 h-3" />
+                        Free Experience & Instant Email Pass
                       </span>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-2.5">
-                      <input
-                        type="text"
-                        name="name"
-                        value={bookingForm.name}
-                        onChange={handleInputChange}
-                        placeholder="Your Full Name *"
-                        required
-                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs text-slate-900 dark:text-slate-100 outline-none focus:ring-2 focus:ring-cyan-500"
-                      />
-                      <input
-                        type="tel"
-                        name="phone"
-                        value={bookingForm.phone}
-                        onChange={handleInputChange}
-                        placeholder="Phone Number *"
-                        required
-                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs text-slate-900 dark:text-slate-100 outline-none focus:ring-2 focus:ring-cyan-500"
-                      />
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                      <div>
+                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
+                          Full Name *
+                        </label>
+                        <input
+                          type="text"
+                          name="name"
+                          value={bookingForm.name}
+                          onChange={handleInputChange}
+                          placeholder="e.g. Rahul Sharma"
+                          required
+                          className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs text-slate-900 dark:text-slate-100 outline-none focus:ring-2 focus:ring-cyan-500"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
+                          Phone Number *
+                        </label>
+                        <input
+                          type="tel"
+                          name="phone"
+                          value={bookingForm.phone}
+                          onChange={handleInputChange}
+                          placeholder="+91 98765 43210"
+                          required
+                          className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs text-slate-900 dark:text-slate-100 outline-none focus:ring-2 focus:ring-cyan-500"
+                        />
+                      </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-2.5">
-                      <input
-                        type="email"
-                        name="email"
-                        value={bookingForm.email}
-                        onChange={handleInputChange}
-                        placeholder="Email Address"
-                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs text-slate-900 dark:text-slate-100 outline-none focus:ring-2 focus:ring-cyan-500"
-                      />
-                      <input
-                        type="date"
-                        name="date"
-                        value={bookingForm.date}
-                        onChange={handleInputChange}
-                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs text-slate-900 dark:text-slate-100 outline-none focus:ring-2 focus:ring-cyan-500"
-                      />
+                    <div>
+                      <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
+                        Email Address (For Confirmation Mail) *
+                      </label>
+                      <div className="relative">
+                        <input
+                          type="email"
+                          name="email"
+                          value={bookingForm.email}
+                          onChange={handleInputChange}
+                          placeholder="your.email@example.com"
+                          required
+                          className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs text-slate-900 dark:text-slate-100 outline-none focus:ring-2 focus:ring-cyan-500"
+                        />
+                        <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-3 pointer-events-none" />
+                      </div>
+                      <span className="text-[10px] text-cyan-600 dark:text-cyan-400 mt-1 block">
+                        We send your official test drive pass & showroom slot directly to this inbox.
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                      <div>
+                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
+                          Preferred Date
+                        </label>
+                        <input
+                          type="date"
+                          name="date"
+                          value={bookingForm.date}
+                          min={new Date().toISOString().split('T')[0]}
+                          onChange={handleInputChange}
+                          className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs text-slate-900 dark:text-slate-100 outline-none focus:ring-2 focus:ring-cyan-500"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
+                          Time Slot
+                        </label>
+                        <select
+                          name="time"
+                          value={bookingForm.time}
+                          onChange={handleInputChange}
+                          className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs text-slate-900 dark:text-slate-100 outline-none focus:ring-2 focus:ring-cyan-500"
+                        >
+                          <option value="morning">Morning (10:00 AM - 1:00 PM)</option>
+                          <option value="afternoon">Afternoon (1:00 PM - 4:00 PM)</option>
+                          <option value="evening">Evening (4:00 PM - 7:30 PM)</option>
+                        </select>
+                      </div>
                     </div>
 
                     <button
                       type="submit"
                       disabled={isSubmitting}
-                      className="w-full mt-2 py-3.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-black text-xs shadow-lg shadow-cyan-500/20 transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
+                      className="w-full mt-2 py-3.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-black text-xs shadow-lg shadow-cyan-500/20 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                     >
-                      {isSubmitting ? 'Submitting Reservation...' : 'Confirm Showroom Booking'}
-                      <ChevronRight className="w-4 h-4" />
+                      {isSubmitting ? (
+                        <>
+                          <div className="w-3.5 h-3.5 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
+                          <span>Dispatching Email Confirmation...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Mail className="w-4 h-4" />
+                          <span>Book Test Drive & Send Email Confirmation</span>
+                          <ChevronRight className="w-4 h-4" />
+                        </>
+                      )}
                     </button>
                   </form>
                 )}
@@ -394,12 +507,21 @@ export default function VehicleModal({
               onClick={() => setActiveTab('enquire')}
               className="px-6 py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-black text-xs shadow-md transition-all cursor-pointer flex items-center gap-1.5"
             >
-              <span>Enquire Now</span>
+              <span>Enquire / Book</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
         </div>
       </div>
+
+      {/* Confirmation Email Pass Modal */}
+      {showEmailModal && bookingResult && (
+        <EmailConfirmationModal
+          bookingResult={bookingResult}
+          vehicle={vehicle}
+          onClose={() => setShowEmailModal(false)}
+        />
+      )}
     </div>
   );
 }
