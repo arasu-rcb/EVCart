@@ -351,10 +351,22 @@ export default function VehicleModal({
                       </h4>
                     </div>
 
-                    <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed max-w-sm mx-auto">
-                      Thank you, <strong>{bookingForm.name}</strong>. A confirmation email has been dispatched to{' '}
-                      <strong className="text-cyan-600 dark:text-cyan-400 underline">{bookingForm.email}</strong> with your showroom entry pass for the <strong>{vehicle.name}</strong>.
-                    </p>
+                    {bookingResult?.isRealSend ? (
+                      <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed max-w-sm mx-auto">
+                        Thank you, <strong>{bookingForm.name}</strong>. A confirmation email has been dispatched to{' '}
+                        <strong className="text-cyan-600 dark:text-cyan-400 underline">{bookingForm.email}</strong> with your showroom entry pass for the <strong>{vehicle.name}</strong>. Please check your inbox and spam folder.
+                      </p>
+                    ) : (
+                      <div className="space-y-2 max-w-sm mx-auto text-center">
+                        <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                          Thank you, <strong>{bookingForm.name}</strong>. Your slot for the <strong>{vehicle.name}</strong> has been reserved!
+                        </p>
+                        <div className="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-[11px] text-amber-700 dark:text-amber-300 text-left">
+                          <strong className="block mb-0.5">⚠️ Why didn't you receive an email?</strong>
+                          Frontend apps cannot send emails to Gmail without an email provider key. Add your free <strong>EmailJS</strong> keys to your environment variables (or Vercel) to deliver live emails directly to inboxes.
+                        </div>
+                      </div>
+                    )}
 
                     <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-2.5">
                       <button

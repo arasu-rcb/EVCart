@@ -130,13 +130,17 @@ export async function sendTestDriveConfirmationEmail(details) {
 
   const { serviceId, templateId, publicKey, isConfigured } = getEmailConfig();
 
-  // Template parameters mapped to standard EmailJS variables
+  // Template parameters mapped to standard EmailJS variables with multiple aliases
   const templateParams = {
     to_name: details.name,
     to_email: details.email,
     user_name: details.name,
     user_email: details.email,
+    email: details.email,
+    reply_to: details.email,
+    recipient_email: details.email,
     user_phone: details.phone,
+    phone: details.phone,
     user_city: details.city || 'Showroom Preferred',
     booking_id: bookingId,
     vehicle_name: details.vehicleName || 'EV Vehicle',
@@ -146,11 +150,17 @@ export async function sendTestDriveConfirmationEmail(details) {
     scheduled_slot: formattedSlot,
     interest_type: details.interestType || 'Test Drive',
     showroom_address: 'EVista Flagship Experience Showroom',
-    support_phone: '+91 1800 200 4567'
+    support_phone: '+91 1800 200 4567',
+    message: `Test Drive Booking Confirmation for ${details.vehicleName} on ${formattedDate} (${formattedSlot}). Booking Reference: ${bookingId}.`
   };
 
   if (isConfigured) {
     try {
+      console.log('[EVista Email] Dispatching live confirmation email via EmailJS...', {
+        to: details.email,
+        serviceId,
+        templateId
+      });
       const response = await emailjs.send(serviceId, templateId, templateParams, publicKey);
       saveBookingLocally(enrichedBooking);
 
@@ -163,8 +173,7 @@ export async function sendTestDriveConfirmationEmail(details) {
         message: `Confirmation email dispatched directly to ${details.email}!`
       };
     } catch (error) {
-      console.error('EmailJS direct dispatch failed:', error);
-      // Fallback gracefully so the user booking is never lost
+      console.error('[EVista Email] EmailJS direct dispatch failed:', error);
       saveBookingLocally(enrichedBooking);
       return {
         success: true,
@@ -172,11 +181,15 @@ export async function sendTestDriveConfirmationEmail(details) {
         sendError: error?.text || error?.message || 'Network error communicating with EmailJS',
         bookingId,
         booking: enrichedBooking,
-        message: `Booking received! We generated your digital pass while email server connected.`
+        message: `Booking received! Digital pass generated (EmailJS returned: ${error?.text || error?.message})`
       };
     }
   } else {
     // Simulated frontend dispatch (development / demo mode)
+    console.warn(
+      '[EVista Email] EmailJS keys are missing or empty in environment variables.',
+      'Running in Digital Pass Preview Mode. To deliver real emails to inboxes, set VITE_EMAILJS_SERVICE_ID, VITE_EMAILJS_TEMPLATE_ID, and VITE_EMAILJS_PUBLIC_KEY in .env and Vercel.'
+    );
     await new Promise((resolve) => setTimeout(resolve, 850));
     saveBookingLocally(enrichedBooking);
 
