@@ -4,7 +4,6 @@ import { bikesData, carsData } from './vehiclesData';
 // Core Showcase Components
 import Navbar from './components/Navbar';
 import HeroSection from './components/HeroSection';
-import VehicleTypeSelector from './components/VehicleTypeSelector';
 import ExploreByNeed from './components/ExploreByNeed';
 import VehicleCard from './components/VehicleCard';
 import VehicleModal from './components/VehicleModal';
@@ -16,6 +15,7 @@ import StudentPlanSection from './components/StudentPlanSection';
 import StudentCalculatorModal from './components/StudentCalculatorModal';
 import ParentVerificationModal from './components/ParentVerificationModal';
 import RecommendationWizardModal from './components/RecommendationWizardModal';
+import OfferClaimModal from './components/OfferClaimModal';
 
 // Additional Showroom Sections
 import OffersSection from './components/OffersSection';
@@ -67,6 +67,8 @@ export default function App() {
   const [verificationType, setVerificationType] = useState('school');
   const [isRecommendationOpen, setIsRecommendationOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [selectedOffer, setSelectedOffer] = useState(null);
+  const [isOfferModalOpen, setIsOfferModalOpen] = useState(false);
 
   // Comparison State (up to 4 vehicles)
   const [comparedVehicleIds, setComparedVehicleIds] = useState([]);
@@ -155,32 +157,27 @@ export default function App() {
             onExploreBikes={() => {
               setActiveCategoryTab('bike');
               setSelectedLifestyle('daily');
-              const el = document.getElementById('vehicle-type-selection');
+              const el = document.getElementById('explore-by-need');
               if (el) el.scrollIntoView({ behavior: 'smooth' });
             }}
             onExploreCars={() => {
               setActiveCategoryTab('car');
               setSelectedLifestyle('daily');
-              const el = document.getElementById('vehicle-type-selection');
+              const el = document.getElementById('explore-by-need');
               if (el) el.scrollIntoView({ behavior: 'smooth' });
             }}
             onFindPerfectEV={() => setIsRecommendationOpen(true)}
           />
 
-          {/* 3. VEHICLE TYPE SELECTION ("WHAT ARE YOU LOOKING FOR?") - COMPACT AUTOMOTIVE TOGGLE */}
-          <VehicleTypeSelector
-            selectedType={activeCategoryTab}
-            onSelectType={(type) => {
+          {/* 3. COMBINED EXPLORE BY NEED & SEGMENT SELECTION */}
+          <ExploreByNeed
+            vehicleType={activeCategoryTab}
+            onSelectVehicleType={(type) => {
               setActiveCategoryTab(type);
               setSelectedLifestyle('daily');
             }}
             bikesCount={bikesData.length}
             carsCount={carsData.length}
-          />
-
-          {/* 4. EXPLORE BY NEED (LIFESTYLE SECTION DEDICATED TO SELECTED TYPE) */}
-          <ExploreByNeed
-            vehicleType={activeCategoryTab}
             selectedCategory={selectedLifestyle}
             onSelectCategory={(catId) => setSelectedLifestyle(catId)}
             onViewVehicle={(v, tab) => {
@@ -191,7 +188,7 @@ export default function App() {
             comparedVehicleIds={comparedVehicleIds}
           />
 
-          {/* 6. EV STUDENT MONTHLY PLAN SECTION */}
+          {/* 4. EV STUDENT MONTHLY PLAN SECTION */}
           <StudentPlanSection
             onOpenCalculator={(type, price) => {
               setCalculatorStudentType(type);
@@ -204,16 +201,17 @@ export default function App() {
             }}
           />
 
-          {/* 7. WHY CHOOSE US (AUTOMOTIVE ASSURANCE) */}
+          {/* 5. WHY CHOOSE US (AUTOMOTIVE ASSURANCE) */}
           <WhyChooseUs />
 
-          {/* 8. EV BENEFITS (PETROL VS EV SAVINGS CALCULATOR) */}
+          {/* 6. EV BENEFITS (PETROL VS EV SAVINGS CALCULATOR) */}
           <EVBenefits />
 
-          {/* 9. SHOWROOM OFFERS */}
+          {/* 7. SHOWROOM OFFERS */}
           <OffersSection
-            onClaimOffer={(offerTitle) => {
-              showToast(`Offer inquiry for "${offerTitle}" initiated with showroom desk`, 'success');
+            onClaimOffer={(offer) => {
+              setSelectedOffer(offer);
+              setIsOfferModalOpen(true);
             }}
             onOpenStudentPlan={() => {
               const el = document.getElementById('student-plan');
@@ -309,8 +307,9 @@ export default function App() {
       {activePage === 'offers' && (
         <main className="flex-1">
           <OffersSection
-            onClaimOffer={(offerTitle) => {
-              showToast(`Offer inquiry for "${offerTitle}" initiated with showroom desk`, 'success');
+            onClaimOffer={(offer) => {
+              setSelectedOffer(offer);
+              setIsOfferModalOpen(true);
             }}
             onOpenStudentPlan={() => handleNavigate('student-plan')}
           />
@@ -471,6 +470,22 @@ export default function App() {
         onViewVehicle={(v) => {
           setIsSearchOpen(false);
           setSelectedVehicle(v);
+        }}
+      />
+
+      {/* Interactive Offer Claim & Consultation Modal */}
+      <OfferClaimModal
+        isOpen={isOfferModalOpen}
+        offer={selectedOffer}
+        onClose={() => {
+          setIsOfferModalOpen(false);
+          setSelectedOffer(null);
+        }}
+        onOpenStudentPlan={() => {
+          setIsOfferModalOpen(false);
+          setSelectedOffer(null);
+          const el = document.getElementById('student-plan');
+          if (el) el.scrollIntoView({ behavior: 'smooth' });
         }}
       />
 
