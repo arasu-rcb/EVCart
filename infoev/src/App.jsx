@@ -105,8 +105,109 @@ export default function App() {
     setComparedVehicleIds(prev => prev.filter(vId => vId !== id));
   };
 
+  // Modal open helpers with history state push so browser back button closes modal safely
+  const openVehicleModal = (vehicle, tab = 'details') => {
+    window.history.pushState({ type: 'modal', modalName: 'vehicle' }, '');
+    setSelectedVehicle(vehicle);
+    setInitialVehicleModalTab(tab);
+  };
+
+  const openCompareModal = () => {
+    window.history.pushState({ type: 'modal', modalName: 'compare' }, '');
+    setIsCompareModalOpen(true);
+  };
+
+  const openCalculatorModal = (type, price) => {
+    window.history.pushState({ type: 'modal', modalName: 'calculator' }, '');
+    setCalculatorStudentType(type);
+    setCalculatorPrice(price);
+    setIsCalculatorOpen(true);
+  };
+
+  const openParentVerificationModal = (type) => {
+    window.history.pushState({ type: 'modal', modalName: 'verification' }, '');
+    setVerificationType(type);
+    setIsParentVerificationOpen(true);
+  };
+
+  const openRecommendationModal = () => {
+    window.history.pushState({ type: 'modal', modalName: 'recommendation' }, '');
+    setIsRecommendationOpen(true);
+  };
+
+  const openSearchModal = () => {
+    window.history.pushState({ type: 'modal', modalName: 'search' }, '');
+    setIsSearchOpen(true);
+  };
+
+  const openOfferModal = (offer) => {
+    window.history.pushState({ type: 'modal', modalName: 'offer' }, '');
+    setSelectedOffer(offer);
+    setIsOfferModalOpen(true);
+  };
+
+  // Browser History & Laptop Back/Swipe Protection
+  useEffect(() => {
+    // Set initial state in history
+    if (!window.history.state) {
+      window.history.replaceState({ type: 'page', page: 'home' }, '', window.location.pathname + window.location.hash);
+    }
+
+    const handlePopState = (e) => {
+      // 1. If any modal is open, close it instead of leaving the website
+      if (selectedVehicle) {
+        setSelectedVehicle(null);
+        return;
+      }
+      if (isCompareModalOpen) {
+        setIsCompareModalOpen(false);
+        return;
+      }
+      if (isCalculatorOpen) {
+        setIsCalculatorOpen(false);
+        return;
+      }
+      if (isParentVerificationOpen) {
+        setIsParentVerificationOpen(false);
+        return;
+      }
+      if (isOfferModalOpen) {
+        setIsOfferModalOpen(false);
+        return;
+      }
+      if (isSearchOpen) {
+        setIsSearchOpen(false);
+        return;
+      }
+      if (isRecommendationOpen) {
+        setIsRecommendationOpen(false);
+        return;
+      }
+
+      // 2. If user is on a dedicated page and hits back, return to home view
+      if (e.state && e.state.page) {
+        setActivePage(e.state.page);
+      } else if (activePage !== 'home') {
+        setActivePage('home');
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [
+    selectedVehicle,
+    isCompareModalOpen,
+    isCalculatorOpen,
+    isParentVerificationOpen,
+    isOfferModalOpen,
+    isSearchOpen,
+    isRecommendationOpen,
+    activePage
+  ]);
+
   // Navigation handlers
   const handleNavigate = (page) => {
+    window.history.pushState({ type: 'page', page }, '', page === 'home' ? '#' : `#${page}`);
     setActivePage(page);
     if (page === 'bikes') {
       setActiveCategoryTab('bike');
@@ -121,7 +222,7 @@ export default function App() {
     if (vehicleType) {
       setActiveCategoryTab(vehicleType);
     }
-    setActivePage('home');
+    handleNavigate('home');
     setTimeout(() => {
       const el = document.getElementById('explore-by-need');
       if (el) el.scrollIntoView({ behavior: 'smooth' });
@@ -143,8 +244,8 @@ export default function App() {
         onNavigate={handleNavigate}
         onSelectCategory={handleSelectLifestyleFromNav}
         comparedCount={comparedVehicleIds.length}
-        onOpenCompare={() => setIsCompareModalOpen(true)}
-        onOpenSearch={() => setIsSearchOpen(true)}
+        onOpenCompare={() => openCompareModal()}
+        onOpenSearch={() => openSearchModal()}
       />
 
       {/* PAGE VIEW ROUTING */}
@@ -166,7 +267,7 @@ export default function App() {
               const el = document.getElementById('explore-by-need');
               if (el) el.scrollIntoView({ behavior: 'smooth' });
             }}
-            onFindPerfectEV={() => setIsRecommendationOpen(true)}
+            onFindPerfectEV={() => openRecommendationModal()}
           />
 
           {/* 3. COMBINED EXPLORE BY NEED & SEGMENT SELECTION */}
@@ -180,25 +281,15 @@ export default function App() {
             carsCount={carsData.length}
             selectedCategory={selectedLifestyle}
             onSelectCategory={(catId) => setSelectedLifestyle(catId)}
-            onViewVehicle={(v, tab) => {
-              setSelectedVehicle(v);
-              setInitialVehicleModalTab(tab || 'details');
-            }}
+            onViewVehicle={(v, tab) => openVehicleModal(v, tab)}
             onToggleCompare={toggleCompare}
             comparedVehicleIds={comparedVehicleIds}
           />
 
           {/* 4. EV STUDENT MONTHLY PLAN SECTION */}
           <StudentPlanSection
-            onOpenCalculator={(type, price) => {
-              setCalculatorStudentType(type);
-              setCalculatorPrice(price);
-              setIsCalculatorOpen(true);
-            }}
-            onOpenParentVerification={(type) => {
-              setVerificationType(type);
-              setIsParentVerificationOpen(true);
-            }}
+            onOpenCalculator={(type, price) => openCalculatorModal(type, price)}
+            onOpenParentVerification={(type) => openParentVerificationModal(type)}
           />
 
           {/* 5. WHY CHOOSE US (AUTOMOTIVE ASSURANCE) */}
@@ -209,14 +300,12 @@ export default function App() {
 
           {/* 7. SHOWROOM OFFERS */}
           <OffersSection
-            onClaimOffer={(offer) => {
-              setSelectedOffer(offer);
-              setIsOfferModalOpen(true);
-            }}
+            onClaimOffer={(offer) => openOfferModal(offer)}
             onOpenStudentPlan={() => {
               const el = document.getElementById('student-plan');
               if (el) el.scrollIntoView({ behavior: 'smooth' });
             }}
+            onOpenParentVerification={(type) => openParentVerificationModal(type)}
           />
 
           {/* 10. REVIEWS & FAQ */}
@@ -246,10 +335,7 @@ export default function App() {
                 vehicle={bike}
                 isCompared={comparedVehicleIds.includes(bike.id)}
                 onToggleCompare={toggleCompare}
-                onViewVehicle={(v, tab) => {
-                  setSelectedVehicle(v);
-                  setInitialVehicleModalTab(tab || 'details');
-                }}
+                onViewVehicle={(v, tab) => openVehicleModal(v, tab)}
               />
             ))}
           </div>
@@ -276,10 +362,7 @@ export default function App() {
                 vehicle={car}
                 isCompared={comparedVehicleIds.includes(car.id)}
                 onToggleCompare={toggleCompare}
-                onViewVehicle={(v, tab) => {
-                  setSelectedVehicle(v);
-                  setInitialVehicleModalTab(tab || 'details');
-                }}
+                onViewVehicle={(v, tab) => openVehicleModal(v, tab)}
               />
             ))}
           </div>
@@ -290,15 +373,8 @@ export default function App() {
       {activePage === 'student-plan' && (
         <main className="flex-1">
           <StudentPlanSection
-            onOpenCalculator={(type, price) => {
-              setCalculatorStudentType(type);
-              setCalculatorPrice(price);
-              setIsCalculatorOpen(true);
-            }}
-            onOpenParentVerification={(type) => {
-              setVerificationType(type);
-              setIsParentVerificationOpen(true);
-            }}
+            onOpenCalculator={(type, price) => openCalculatorModal(type, price)}
+            onOpenParentVerification={(type) => openParentVerificationModal(type)}
           />
         </main>
       )}
@@ -307,11 +383,9 @@ export default function App() {
       {activePage === 'offers' && (
         <main className="flex-1">
           <OffersSection
-            onClaimOffer={(offer) => {
-              setSelectedOffer(offer);
-              setIsOfferModalOpen(true);
-            }}
+            onClaimOffer={(offer) => openOfferModal(offer)}
             onOpenStudentPlan={() => handleNavigate('student-plan')}
+            onOpenParentVerification={(type) => openParentVerificationModal(type)}
           />
         </main>
       )}
@@ -400,7 +474,7 @@ export default function App() {
         comparedVehicles={comparedVehicleObjects}
         onRemove={removeComparisonItem}
         onClear={clearComparison}
-        onOpenFullCompare={() => setIsCompareModalOpen(true)}
+        onOpenFullCompare={() => openCompareModal()}
       />
 
       {/* Full Compare Matrix Modal with Dynamic "Our Best Choice" Winner */}
@@ -411,7 +485,7 @@ export default function App() {
           onRemoveVehicle={removeComparisonItem}
           onViewVehicle={(v) => {
             setIsCompareModalOpen(false);
-            setSelectedVehicle(v);
+            openVehicleModal(v);
           }}
         />
       )}
@@ -437,10 +511,7 @@ export default function App() {
         initialStudentType={calculatorStudentType}
         initialPrice={calculatorPrice}
         onClose={() => setIsCalculatorOpen(false)}
-        onProceedToVerification={(type) => {
-          setVerificationType(type);
-          setIsParentVerificationOpen(true);
-        }}
+        onProceedToVerification={(type) => openParentVerificationModal(type)}
       />
 
       {/* Safe 4-Step Parent/Guardian Verification Flow */}
@@ -459,7 +530,7 @@ export default function App() {
         onClose={() => setIsRecommendationOpen(false)}
         onViewVehicle={(v) => {
           setIsRecommendationOpen(false);
-          setSelectedVehicle(v);
+          openVehicleModal(v);
         }}
       />
 
@@ -469,7 +540,7 @@ export default function App() {
         onClose={() => setIsSearchOpen(false)}
         onViewVehicle={(v) => {
           setIsSearchOpen(false);
-          setSelectedVehicle(v);
+          openVehicleModal(v);
         }}
       />
 

@@ -11,10 +11,12 @@
   html {
     scroll-behavior: smooth;
     font-family: 'Plus Jakarta Sans', sans-serif;
+    overscroll-behavior-x: none;
   }
 
   body {
-    @apply antialiased bg-slate-950 text-slate-100 transition-colors duration-300;
+    @apply antialiased bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 transition-colors duration-300;
+    overscroll-behavior-x: none;
   }
 
   h1, h2, h3, h4, h5, h6 {

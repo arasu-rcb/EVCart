@@ -10,20 +10,20 @@ export default function CompareDrawer({
   if (!comparedVehicles || comparedVehicles.length === 0) return null;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-40 bg-slate-950/95 backdrop-blur-xl border-t border-slate-800 text-white shadow-2xl transition-all duration-300 animate-in slide-in-from-bottom-6">
+    <div className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-slate-950/95 backdrop-blur-xl border-t border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white shadow-2xl transition-all duration-300 animate-in slide-in-from-bottom-6">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-col sm:flex-row items-center justify-between gap-4">
         
         {/* Left: Info & Chips */}
         <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-indigo-500/20 border border-indigo-500/40 flex items-center justify-center text-indigo-400">
+            <div className="w-8 h-8 rounded-lg bg-indigo-500/15 dark:bg-indigo-500/20 border border-indigo-500/30 dark:border-indigo-500/40 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
               <Scale className="w-4 h-4" />
             </div>
             <div>
-              <span className="font-extrabold text-xs sm:text-sm block">
+              <span className="font-extrabold text-xs sm:text-sm block text-slate-900 dark:text-white">
                 Compare Queue ({comparedVehicles.length}/4)
               </span>
-              <span className="text-[10px] text-slate-400">
+              <span className="text-[10px] text-slate-500 dark:text-slate-400">
                 {comparedVehicles.length >= 2 ? 'Ready to compare specs & find best choice' : 'Select at least 2 models'}
               </span>
             </div>
@@ -34,18 +34,18 @@ export default function CompareDrawer({
             {comparedVehicles.map((vehicle) => (
               <div
                 key={vehicle.id}
-                className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl bg-slate-900 border border-slate-800 shrink-0 text-xs"
+                className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shrink-0 text-xs shadow-sm"
               >
                 <img
                   src={vehicle.image}
                   alt={vehicle.name}
                   className="w-7 h-5 object-contain"
                 />
-                <span className="font-bold text-slate-200 truncate max-w-28">{vehicle.name}</span>
-                <span className="text-cyan-400 text-[10px] font-semibold">{formatINR(vehicle.price)}</span>
+                <span className="font-bold text-slate-800 dark:text-slate-200 truncate max-w-28">{vehicle.name}</span>
+                <span className="text-cyan-700 dark:text-cyan-400 text-[10px] font-bold">{formatINR(vehicle.price)}</span>
                 <button
                   onClick={() => onRemove(vehicle.id)}
-                  className="p-0.5 hover:bg-slate-800 rounded text-slate-400 hover:text-red-400 transition-colors"
+                  className="p-0.5 hover:bg-slate-200 dark:hover:bg-slate-800 rounded text-slate-400 hover:text-red-500 transition-colors"
                   title="Remove"
                 >
                   <X className="w-3.5 h-3.5" />

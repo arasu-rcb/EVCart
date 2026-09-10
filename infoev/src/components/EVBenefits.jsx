@@ -79,23 +79,23 @@ export default function EVBenefits() {
         </div>
 
         {/* Dynamic Savings Calculator Bar */}
-        <div className="mb-12 p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 border border-indigo-500/30 text-white shadow-2xl text-left">
+        <div className="mb-12 p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-cyan-50/80 via-sky-50 to-indigo-50/80 dark:from-slate-900 dark:via-indigo-950 dark:to-slate-900 border border-indigo-200 dark:border-indigo-500/30 text-slate-900 dark:text-white shadow-xl text-left">
           <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
             <div className="flex-1 space-y-2">
-              <span className="text-xs font-bold text-cyan-400 uppercase tracking-wider">
+              <span className="text-xs font-bold text-cyan-600 dark:text-cyan-400 uppercase tracking-wider">
                 Interactive Fuel Savings Estimator
               </span>
-              <h3 className="text-xl sm:text-2xl font-black">
+              <h3 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
                 How Much Will You Save Every Year?
               </h3>
-              <p className="text-xs text-slate-300">
+              <p className="text-xs text-slate-600 dark:text-slate-300">
                 Adjust your estimated daily travel distance to see immediate rupee savings:
               </p>
 
               <div className="pt-3 max-w-md">
-                <div className="flex justify-between text-xs font-bold mb-1">
+                <div className="flex justify-between text-xs font-bold mb-1 text-slate-700 dark:text-slate-200">
                   <span>Daily Commute:</span>
-                  <span className="text-cyan-400 font-extrabold text-sm">{dailyKm} km / day</span>
+                  <span className="text-cyan-600 dark:text-cyan-400 font-extrabold text-sm">{dailyKm} km / day</span>
                 </div>
                 <input
                   type="range"
@@ -104,27 +104,27 @@ export default function EVBenefits() {
                   step="5"
                   value={dailyKm}
                   onChange={(e) => setDailyKm(Number(e.target.value))}
-                  className="w-full accent-cyan-400 cursor-pointer"
+                  className="w-full accent-cyan-500 cursor-pointer"
                 />
               </div>
             </div>
 
             {/* Savings Cards */}
             <div className="flex flex-wrap sm:flex-nowrap gap-4 shrink-0">
-              <div className="p-4 rounded-2xl bg-slate-950/80 border border-slate-800 text-center min-w-36">
-                <span className="text-[10px] text-slate-400 uppercase font-bold block">Annual Savings</span>
-                <span className="text-2xl sm:text-3xl font-black text-emerald-400 mt-1 block">
+              <div className="p-4 rounded-2xl bg-white dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 text-center min-w-36 shadow-sm">
+                <span className="text-[10px] text-slate-500 dark:text-slate-400 uppercase font-bold block">Annual Savings</span>
+                <span className="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400 mt-1 block">
                   {formatINR(Math.round(annualSavings))}
                 </span>
-                <span className="text-[10px] text-slate-400 mt-0.5 block">Every 12 Months</span>
+                <span className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 block">Every 12 Months</span>
               </div>
 
-              <div className="p-4 rounded-2xl bg-slate-950/80 border border-emerald-500/40 text-center min-w-36 shadow-lg shadow-emerald-500/10">
-                <span className="text-[10px] text-emerald-400 uppercase font-bold block">5-Year Retention</span>
-                <span className="text-2xl sm:text-3xl font-black text-white mt-1 block">
+              <div className="p-4 rounded-2xl bg-white dark:bg-slate-950/80 border border-emerald-300 dark:border-emerald-500/40 text-center min-w-36 shadow-md shadow-emerald-500/10">
+                <span className="text-[10px] text-emerald-700 dark:text-emerald-400 uppercase font-bold block">5-Year Retention</span>
+                <span className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white mt-1 block">
                   {formatINR(Math.round(fiveYearSavings))}
                 </span>
-                <span className="text-[10px] text-cyan-300 mt-0.5 block">Capital Saved</span>
+                <span className="text-[10px] text-cyan-600 dark:text-cyan-300 mt-0.5 block font-bold">Capital Saved</span>
               </div>
             </div>
           </div>
