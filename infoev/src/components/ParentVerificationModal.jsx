@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import {
   X, ShieldCheck, CheckCircle2,
-  AlertCircle, ArrowRight
+  AlertCircle, ArrowRight, Upload, FileText, Home
 } from 'lucide-react';
 
 export default function ParentVerificationModal({
@@ -17,11 +17,16 @@ export default function ParentVerificationModal({
     studentId: '',
     age: initialType === 'school' ? '16' : '19',
     studentPhone: '',
+    city: '',
+    // Native Address & Mandatory Document fields
+    nativeAddress: '',
+    documentType: initialType === 'school' ? 'School Student ID Card' : 'College Student ID Card',
+    documentNumber: '',
+    documentFileName: 'student_verification_id.pdf',
     guardianName: '',
     relationship: 'Father',
     guardianPhone: '',
     guardianEmail: '',
-    city: '',
     consentSafeSpeed: true,
     consentHelmet: true,
     consentShowroomContact: true
@@ -43,6 +48,14 @@ export default function ParentVerificationModal({
     if (step === 1) {
       if (!formData.studentName || !formData.institution) {
         alert('Please fill in student name and school/college.');
+        return;
+      }
+      if (!formData.nativeAddress) {
+        alert('Please provide your Native / Permanent Address (mandatory for student offer).');
+        return;
+      }
+      if (!formData.documentNumber) {
+        alert('Student document is mandatory. Please enter your Document/ID Number.');
         return;
       }
       setStep(2);
@@ -78,10 +91,10 @@ export default function ParentVerificationModal({
             </div>
             <div>
               <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white">
-                {initialType === 'school' ? 'Parent / Guardian Verification Flow' : 'Student Eligibility Verification'}
+                {initialType === 'school' ? 'School Student Eligibility & Guardian Flow' : 'College Student Eligibility Verification'}
               </h3>
               <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                Safe, privacy-first approval (No passwords or card numbers requested)
+                Safe, privacy-first approval • Mandatory Document & Native Address Accepted
               </p>
             </div>
           </div>
@@ -97,7 +110,7 @@ export default function ParentVerificationModal({
         {/* Step Indicator */}
         <div className="px-6 py-3 bg-slate-100 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between text-xs">
           {[
-            { num: 1, label: 'Student' },
+            { num: 1, label: 'Student & Docs' },
             { num: 2, label: 'Guardian' },
             { num: 3, label: 'Safety Consent' },
             { num: 4, label: 'Verified' }
@@ -124,10 +137,10 @@ export default function ParentVerificationModal({
             <form onSubmit={handleNext} className="space-y-4">
               <div>
                 <h4 className="text-base font-black text-slate-900 dark:text-white mb-1">
-                  Step 1: Student Information
+                  Step 1: Student Information & Mandatory Document
                 </h4>
                 <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">
-                  Please provide the student details enrolled in a recognized institution.
+                  Please provide verified student details. Document upload is mandatory. Native place address is accepted for hostel/PG students.
                 </p>
               </div>
 
@@ -156,7 +169,7 @@ export default function ParentVerificationModal({
                     name="institution"
                     value={formData.institution}
                     onChange={handleChange}
-                    placeholder="e.g. St. Xavier's High School"
+                    placeholder="e.g. St. Xavier's / IIT Madras"
                     required
                     className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-xs focus:ring-2 focus:ring-emerald-500 outline-none"
                   />
@@ -178,6 +191,97 @@ export default function ParentVerificationModal({
                 </div>
               </div>
 
+              {/* Native Address Field (Address can be native for both school and college) */}
+              <div className="p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/25 space-y-2">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-bold text-emerald-800 dark:text-emerald-300 flex items-center gap-1.5">
+                    <Home className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                    <span>Native Place / Permanent Address *</span>
+                  </label>
+                  <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-400 bg-white/60 dark:bg-slate-800 px-2 py-0.5 rounded-md border border-emerald-500/20">
+                    Native Allowed
+                  </span>
+                </div>
+                <input
+                  type="text"
+                  name="nativeAddress"
+                  value={formData.nativeAddress}
+                  onChange={handleChange}
+                  placeholder="e.g. Native Village/Town, District, State (or Permanent Home Address)"
+                  required
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-xs focus:ring-2 focus:ring-emerald-500 outline-none"
+                />
+                <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-tight">
+                  Students staying in hostels, paying guest (PG) accommodations, or temporary rentals can provide their native hometown/permanent residence.
+                </p>
+              </div>
+
+              {/* Mandatory Document Proof Field */}
+              <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 space-y-3">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+                    <FileText className="w-3.5 h-3.5 text-cyan-500" />
+                    <span>Student Verification Document *</span>
+                  </label>
+                  <span className="text-[10px] font-black text-rose-600 dark:text-rose-400 bg-rose-500/10 px-2 py-0.5 rounded-md border border-rose-500/20 uppercase tracking-wider">
+                    Mandatory *
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-[11px] font-bold text-slate-500 block mb-1">Document Type *</label>
+                    <select
+                      name="documentType"
+                      value={formData.documentType}
+                      onChange={handleChange}
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-xs focus:ring-2 focus:ring-emerald-500 outline-none font-medium"
+                    >
+                      <option value="School / College Student ID Card">Student ID Card (Front & Back)</option>
+                      <option value="Bonafide Certificate">Official Bonafide Certificate</option>
+                      <option value="Current Academic Year Fee Receipt">Current Academic Year Fee Receipt</option>
+                      <option value="Admission Confirmation Letter">Institutional Admission Letter</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="text-[11px] font-bold text-slate-500 block mb-1">Document / ID No. *</label>
+                    <input
+                      type="text"
+                      name="documentNumber"
+                      value={formData.documentNumber}
+                      onChange={handleChange}
+                      placeholder="e.g. STU-2026-9942 or Roll No."
+                      required
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-xs focus:ring-2 focus:ring-emerald-500 outline-none"
+                    />
+                  </div>
+                </div>
+
+                {/* Upload Attachment Bar */}
+                <div className="pt-2 flex items-center justify-between border-t border-slate-200 dark:border-slate-700/80 text-xs">
+                  <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-semibold text-[11px]">
+                    <CheckCircle2 className="w-3.5 h-3.5" />
+                    <span>{formData.documentFileName} attached</span>
+                  </div>
+
+                  <label className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 text-slate-800 dark:text-slate-200 text-xs font-bold cursor-pointer transition-colors">
+                    <Upload className="w-3 h-3" />
+                    <span>Upload Proof</span>
+                    <input
+                      type="file"
+                      accept=".pdf,.jpg,.jpeg,.png"
+                      className="hidden"
+                      onChange={(e) => {
+                        if (e.target.files && e.target.files[0]) {
+                          setFormData(prev => ({ ...prev, documentFileName: e.target.files[0].name }));
+                        }
+                      }}
+                    />
+                  </label>
+                </div>
+              </div>
+
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">
@@ -194,7 +298,7 @@ export default function ParentVerificationModal({
                 </div>
                 <div>
                   <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">
-                    City / Town
+                    Current Campus City / Town
                   </label>
                   <input
                     type="text"
@@ -261,33 +365,41 @@ export default function ParentVerificationModal({
                 </div>
               </div>
 
-              <div>
-                <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">
-                  Guardian Mobile Phone *
-                </label>
-                <input
-                  type="tel"
-                  name="guardianPhone"
-                  value={formData.guardianPhone}
-                  onChange={handleChange}
-                  placeholder="+91 98765 43210"
-                  required
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-xs focus:ring-2 focus:ring-emerald-500 outline-none"
-                />
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">
+                    Guardian Phone Number *
+                  </label>
+                  <input
+                    type="tel"
+                    name="guardianPhone"
+                    value={formData.guardianPhone}
+                    onChange={handleChange}
+                    placeholder="+91 98765 43210"
+                    required
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-xs focus:ring-2 focus:ring-emerald-500 outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">
+                    Guardian Email
+                  </label>
+                  <input
+                    type="email"
+                    name="guardianEmail"
+                    value={formData.guardianEmail}
+                    onChange={handleChange}
+                    placeholder="guardian@example.com"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-xs focus:ring-2 focus:ring-emerald-500 outline-none"
+                  />
+                </div>
               </div>
 
-              <div>
-                <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">
-                  Guardian Email Address
-                </label>
-                <input
-                  type="email"
-                  name="guardianEmail"
-                  value={formData.guardianEmail}
-                  onChange={handleChange}
-                  placeholder="parent.contact@gmail.com"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-xs focus:ring-2 focus:ring-emerald-500 outline-none"
-                />
+              <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 text-[11px] text-slate-600 dark:text-slate-400 space-y-1">
+                <div><strong>Student:</strong> {formData.studentName} ({formData.institution})</div>
+                <div><strong>Native Place Address:</strong> {formData.nativeAddress}</div>
+                <div><strong>Document Verified:</strong> {formData.documentType} ({formData.documentNumber})</div>
               </div>
 
               <div className="flex gap-2 pt-2">
@@ -302,7 +414,7 @@ export default function ParentVerificationModal({
                   type="submit"
                   className="flex-1 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md"
                 >
-                  <span>Proceed to Consent</span>
+                  <span>Continue to Safety Consent</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
@@ -313,10 +425,10 @@ export default function ParentVerificationModal({
             <form onSubmit={handleNext} className="space-y-4">
               <div>
                 <h4 className="text-base font-black text-slate-900 dark:text-white mb-1">
-                  Step 3: Guardian Consent & Safety Acknowledgement
+                  Step 3: Road Safety & Governance Consent
                 </h4>
                 <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">
-                  Please review the terms of safe operation for electric two-wheelers and student concept plans.
+                  Please review the statutory terms and digital safety declarations.
                 </p>
               </div>
 
@@ -364,7 +476,7 @@ export default function ParentVerificationModal({
               <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 text-[11px] leading-relaxed flex items-start gap-2">
                 <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
                 <span>
-                  Purchase can proceed only after successful guardian verification and applicable financing/legal eligibility checks.
+                  Purchase can proceed only after successful guardian verification, mandatory document verification, and applicable legal eligibility checks.
                 </span>
               </div>
 
@@ -402,18 +514,26 @@ export default function ParentVerificationModal({
                 </p>
               </div>
 
-              <div className="p-4 rounded-2xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 max-w-sm mx-auto text-left space-y-1 text-xs">
+              <div className="p-4 rounded-2xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 max-w-sm mx-auto text-left space-y-1.5 text-xs">
                 <div className="flex justify-between">
                   <span className="text-slate-400">Application Ref:</span>
                   <span className="font-mono font-bold text-emerald-400">{applicationId}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-400">Guardian Contact:</span>
-                  <span className="font-bold text-slate-200">{formData.guardianPhone}</span>
+                  <span className="font-bold text-slate-900 dark:text-slate-200">{formData.guardianPhone}</span>
                 </div>
                 <div className="flex justify-between">
+                  <span className="text-slate-400">Native Address:</span>
+                  <span className="font-bold text-slate-900 dark:text-slate-200 text-right truncate max-w-[180px]">{formData.nativeAddress}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-400">Document Verified:</span>
+                  <span className="font-bold text-cyan-600 dark:text-cyan-400">{formData.documentNumber}</span>
+                </div>
+                <div className="flex justify-between pt-1 border-t border-slate-200 dark:border-slate-700">
                   <span className="text-slate-400">Verification Status:</span>
-                  <span className="font-bold text-cyan-400">Pending Showroom Callback</span>
+                  <span className="font-bold text-emerald-500">Document & Native Address Logged</span>
                 </div>
               </div>
 

@@ -91,25 +91,6 @@ export default function VehicleModal({
               />
             </div>
 
-            {/* Available Colorways */}
-            {vehicle.colors && vehicle.colors.length > 0 && (
-              <div className="flex items-center gap-2 mb-4">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                  Available Colorways:
-                </span>
-                <div className="flex items-center gap-1.5">
-                  {vehicle.colors.map((c, i) => (
-                    <span
-                      key={i}
-                      className="w-4 h-4 rounded-full border border-slate-300 dark:border-slate-700 inline-block shadow-sm"
-                      style={{ backgroundColor: c.hex }}
-                      title={c.name}
-                    />
-                  ))}
-                </div>
-              </div>
-            )}
-
             {/* Price & EMI Highlight Box */}
             <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm grid grid-cols-2 gap-4">
               <div>
